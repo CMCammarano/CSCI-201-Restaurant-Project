@@ -10,5 +10,6 @@ package core.agent;
  * @author ColinCammarano
  */
 public class Agent {
-    
+	
 }
+	

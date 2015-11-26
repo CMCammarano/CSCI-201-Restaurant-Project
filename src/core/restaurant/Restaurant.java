@@ -10,5 +10,5 @@ package core.restaurant;
  * @author ColinCammarano
  */
 public class Restaurant {
-    
+	
 }

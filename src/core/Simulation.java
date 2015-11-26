@@ -10,5 +10,5 @@ package core;
  * @author ColinCammarano
  */
 public class Simulation {
-    
+	
 }

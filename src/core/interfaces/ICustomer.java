@@ -10,5 +10,5 @@ package core.interfaces;
  * @author ColinCammarano
  */
 public interface ICustomer {
-    
+	
 }
