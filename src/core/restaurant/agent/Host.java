@@ -98,11 +98,13 @@ public class Host extends Agent {
 		
 		public WaiterHandler(Waiter waiter) {
 			this.waiter = waiter;
+			state = WaiterStateEnum.Working;
 		}
 		
 		public WaiterHandler(Waiter waiter, Table table) {
 			this.waiter = waiter;
 			this.table = table;
+			state = WaiterStateEnum.Working;
 		}
 	}
 	
