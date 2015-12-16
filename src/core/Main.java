@@ -5,10 +5,15 @@
  */
 package core;
 
+import core.restaurant.Restaurant;
+
 /**
  *
  * @author ColinCammarano
  */
-public class Simulation {
+public class Main {
 	
+	public static void main(String [] args) {
+		Restaurant restaurant = new Restaurant();
+	}
 }

@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package core.restaurant;
+package core.restaurant.agent;
 
 /**
  *
- * @author cmcammarano
+ * @author ColinCammarano
  */
-public class Restaurant {
+public class Waiter {
 	
-	public Restaurant() {}
 }

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package core.interfaces;
+package core.restaurant.agent;
 
 /**
  *
- * @author ColinCammarano
+ * @author cmcammarano
  */
-public interface IWaiter {
+public class Host {
 	
 }
