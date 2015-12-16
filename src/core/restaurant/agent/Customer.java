@@ -81,6 +81,7 @@ public class Customer extends Agent {
 		if (m_state == CustomerStateEnum.Leaving && m_event == EventEnum.Done) {
 			m_state = CustomerStateEnum.Idle;
 			leaveRestaurant();
+			return false;
 		}
 		return false;
 	}
@@ -103,27 +104,32 @@ public class Customer extends Agent {
 	public void sitAtTable(Message message) {
 		Waiter waiter = message.get(0);
 		Table table = message.get(1);
+		
+		print(waiter.getName() + " took us to " + table.toString());
+		m_state = CustomerStateEnum.Seated;
+		m_event = EventEnum.Seated;
+		stateChanged();
 	}
 		
 	public void decideFood() {
-		
+		stateChanged();
 	}
 	
 	public void reorder(Message message) {
-		
+		stateChanged();
 	}
 	
 	public void receiveFood(Message message) {
-		
+		stateChanged();
 	}
 	
 	public void receiveCheck() {
-		
+		stateChanged();
 	}
 	
 	// Messages -- Cashier
 	public void receiveChange(Message message) {
-		
+		stateChanged();
 	}
 	
 	/* ACCESSORS AND MUTATORS */
