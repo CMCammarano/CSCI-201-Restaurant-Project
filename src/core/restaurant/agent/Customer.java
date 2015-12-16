@@ -7,11 +7,8 @@ package core.restaurant.agent;
 
 import core.agent.Agent;
 import core.agent.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import core.restaurant.Table;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -20,9 +17,6 @@ import java.util.logging.Logger;
 public class Customer extends Agent {
 	
 	/* PRIVATE MEMBER VARIABLES */
-	private static final int HUNGER_BOUNDS = 6;
-	private static final float MONEY_BOUNDS = 100.0f;
-
 	private int m_hunger;
 	private float m_money;
 	private CustomerStateEnum m_state;
@@ -30,15 +24,27 @@ public class Customer extends Agent {
 	private Host m_host;
 	private Waiter m_waiter;
 	private Cashier m_cashier;
+	private Table m_table;
 	
 	/* CONSTRUCTOR */
 	public Customer(String name) {
 		super(name);
 		
 		Random random = new Random();
-		m_money = random.nextFloat() * MONEY_BOUNDS;
-		m_hunger = random.nextInt(HUNGER_BOUNDS);
+		m_hunger = 5;
+		m_money = 20.0f;
 		m_state = CustomerStateEnum.Idle;
+		m_event = EventEnum.None;
+	}
+	
+	public Customer(String name, int hunger, float money) {
+		super(name);
+		
+		Random random = new Random();
+		m_hunger = hunger;
+		m_money = money;
+		m_state = CustomerStateEnum.Idle;
+		m_event = EventEnum.None;
 	}
 	
 	/* PRIVATE MEMBER METHODS */
@@ -48,7 +54,7 @@ public class Customer extends Agent {
 		if (m_money < 5.99f) {
 			print("I can't afford anything here.");
 			m_state = CustomerStateEnum.Leaving;
-			m_event = EventEnum.DoneLeaving;
+			m_event = EventEnum.Done;
 		}
 		
 		else {
@@ -62,48 +68,62 @@ public class Customer extends Agent {
 		m_host.sendMessage("customerLeftRestaurant", new Message(this));
 	}
 	
-	// Messages -- Host
-	private void restaurantIsFull() {
-		print("Restaurant is full.");
-		m_state = CustomerStateEnum.Leaving;
-	}
-	
-	// Messages -- Waiter
-	private void sitAtTable(Message message) {
-		
-	}
-		
-	private void decideFood() {
-		
-	}
-	
-	private void reorder(Message message) {
-		
-	}
-	
-	private void receiveFood(Message message) {
-		
-	}
-	
-	private void receiveCheck() {
-		
-	}
-	
-	// Messages -- Cashier
-	private void receiveChange(Message message) {
-		
-	}
-	
 	/* PUBLIC MEMBER METHODS */
 	@Override
 	public boolean update() {
 		
-		if (m_state == CustomerStateEnum.Idle && m_event == EventEnum.GotHungry ){
+		if (m_state == CustomerStateEnum.Idle && m_event == EventEnum.GotHungry) {
 			m_state = CustomerStateEnum.WaitingInRestaurant;
 			goToRestaurant();
 			return true;
 		}
+		
+		if (m_state == CustomerStateEnum.Leaving && m_event == EventEnum.Done) {
+			m_state = CustomerStateEnum.Idle;
+			leaveRestaurant();
+		}
 		return false;
+	}
+	
+	public void becomeHungry() {
+		print("I am hungry and want to eat.");
+		m_event = EventEnum.GotHungry;
+		stateChanged();
+	}
+	
+	// Messages -- Host
+	public void restaurantIsFull() {
+		print("Restaurant is full.");
+		m_state = CustomerStateEnum.Leaving;
+		m_event = EventEnum.Done;
+		stateChanged();
+	}
+	
+	// Messages -- Waiter
+	public void sitAtTable(Message message) {
+		Waiter waiter = message.get(0);
+		Table table = message.get(1);
+	}
+		
+	public void decideFood() {
+		
+	}
+	
+	public void reorder(Message message) {
+		
+	}
+	
+	public void receiveFood(Message message) {
+		
+	}
+	
+	public void receiveCheck() {
+		
+	}
+	
+	// Messages -- Cashier
+	public void receiveChange(Message message) {
+		
 	}
 	
 	/* ACCESSORS AND MUTATORS */
@@ -151,6 +171,6 @@ public class Customer extends Agent {
 		GotCheck,
 		ReadyToPay,
 		ReadyToLeave,
-		DoneLeaving
+		Done
 	}
 }

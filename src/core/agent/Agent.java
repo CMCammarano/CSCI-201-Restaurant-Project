@@ -38,7 +38,6 @@ public abstract class Agent {
 		sb.append(getName());
 		sb.append(": ");
 		sb.append(msg);
-		sb.append("\n");
 		System.out.println(sb.toString());
 	}
 	
@@ -47,7 +46,7 @@ public abstract class Agent {
 	
 	public void sendMessage(String message) {
 		try {
-			Method method = this.getClass().getMethod(message);
+			Method method = getClass().getDeclaredMethod(message);
 			method.invoke(this);
 		} catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace(System.err);
@@ -56,7 +55,7 @@ public abstract class Agent {
 	}
 	public void sendMessage(String message, Message data) {
 		try {
-			Method method = this.getClass().getMethod(message, Message.class);
+			Method method = getClass().getDeclaredMethod(message, Message.class);
 			method.invoke(this, data);
 		} catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace(System.err);

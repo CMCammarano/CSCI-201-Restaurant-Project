@@ -22,15 +22,75 @@ public class Host extends Agent {
 	private final List<CustomerHandler> m_customers;
 	private final List<Table> m_tables;
 	
-	public Host(String name) {
+	public Host(String name, List<Table> tables) {
 		super(name);
 		
 		m_waiters = Collections.synchronizedList(new ArrayList<WaiterHandler>());
 		m_customers = Collections.synchronizedList(new ArrayList<CustomerHandler>());
-		m_tables = Collections.synchronizedList(new ArrayList<Table>());
+		m_tables = Collections.synchronizedList(tables);
 	}
 	
-	private void customerEnteredRestaurant(Message message) {
+	/* PRIVATE MEMBER METHODS */
+	private boolean assignCustomerToTable(CustomerHandler customer) {
+		Table unassignedTable = null;
+		synchronized (m_tables) {
+			for (Table table : m_tables) {
+				if (table.getOccupant() == null) {
+					unassignedTable = table;
+					break;
+				}
+			}
+		}
+		
+		if (unassignedTable != null) {
+			if (m_waiters.size() > 0) {			
+				WaiterHandler waiter = m_waiters.get(0);
+				synchronized (m_waiters) {
+					for (WaiterHandler w : m_waiters) {
+						if (waiter.numCustomers > w.numCustomers) {
+							waiter = w;
+						}
+					}
+				}
+				
+				print("Assigning " + customer.customer.getName() + " to waiter " + waiter.waiter.getName() + " at " + unassignedTable.toString());
+				
+				customer.state = CustomerStateEnum.Eating;
+				waiter.state = WaiterStateEnum.Working;
+				waiter.table = unassignedTable;
+				waiter.numCustomers++;
+				waiter.waiter.sendMessage("seatCustomer", new Message(customer.customer, unassignedTable));
+				return true;
+			}
+		}
+		
+		else {
+			print("Cannot seat " + customer.customer.getName());
+			customer.state = CustomerStateEnum.Idle;
+			customer.customer.sendMessage("restaurantIsFull");
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean update() {
+		boolean repeat = false;
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
+				if (c.state == CustomerStateEnum.Idle) {
+					repeat = assignCustomerToTable(c);
+					if (!repeat) {
+						break;
+					}
+				}
+			}
+		}
+		return repeat;
+	}
+	
+	// Messages -- Customer
+	public void customerEnteredRestaurant(Message message) {
 		Customer customer = message.get(0);
 		print("Customer " + customer.getName() + " entered the restaurant.");
 		synchronized (m_customers) {
@@ -47,9 +107,11 @@ public class Host extends Agent {
 				m_customers.add(c);
 			}
 		}
+		
+		stateChanged();
 	}
 	
-	private void customerLeftRestaurant(Message message) {
+	public void customerLeftRestaurant(Message message) {
 		Customer customer = message.get(0);
 		print("Customer " + customer.getName() + " left the restaurant.");
 		
@@ -61,11 +123,8 @@ public class Host extends Agent {
 				}
 			}
 		}
-	}
-	
-	@Override
-	public boolean update() {
-		return false;
+		
+		stateChanged();
 	}
 	
 	public void addWaiter(Waiter waiter) {
@@ -79,22 +138,25 @@ public class Host extends Agent {
 	private class CustomerHandler {
 		public Customer customer;
 		public Table table;
+		public CustomerStateEnum state;
 		
 		public CustomerHandler(Customer customer) {
 			this.customer = customer;
+			state = CustomerStateEnum.Idle;
 		}
 		
 		public CustomerHandler(Customer customer, Table table) {
 			this.customer = customer;
 			this.table = table;
+			state = CustomerStateEnum.Idle;
 		}
 	}
 	
 	private class WaiterHandler {
-		public int numCustomers;
-		public WaiterStateEnum state;
 		public Waiter waiter;
 		public Table table;
+		public WaiterStateEnum state;
+		public int numCustomers;
 		
 		public WaiterHandler(Waiter waiter) {
 			this.waiter = waiter;
@@ -115,5 +177,6 @@ public class Host extends Agent {
 	
 	private enum CustomerStateEnum {
 		Idle,
+		Eating
 	}
 }

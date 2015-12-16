@@ -6,6 +6,7 @@
 package core.restaurant.agent;
 
 import core.agent.Agent;
+import core.agent.Message;
 
 /**
  *
@@ -15,6 +16,7 @@ public class Waiter extends Agent {
 
 	private Host m_host;
 	private Cashier m_cashier;
+	private Cook m_cook;
 	
 	public Waiter(String name) {
 		super(name);
@@ -25,9 +27,18 @@ public class Waiter extends Agent {
 		return false;
 	}
 	
+	// Messages -- Host
+	public void seatCustomer(Message message) {
+		
+	}
+	
+	/* ACCESSORS AND MUTATORS */
 	public Host getHost() { return m_host; }
 	public void setHost(Host host) { m_host = host; }
 	
 	public Cashier getCashier() { return m_cashier; }
 	public void setCashier(Cashier cashier) { m_cashier = cashier; }
+	
+	public Cook getCook() { return m_cook; }
+	public void setCook(Cook cook) { m_cook = cook; }
 }
