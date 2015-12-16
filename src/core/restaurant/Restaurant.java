@@ -29,12 +29,16 @@ public class Restaurant {
 		m_cashier = new Cashier("Cashier");
 		
 		m_waiters = new ArrayList<Waiter>();
+		
+		// FOR INITIAL TESTING
+		AddWaiter("Jeff");
 	}
 	
 	public void AddWaiter(String name) {
 		Waiter waiter = new Waiter(name);
 		waiter.setHost(m_host);
 		waiter.setCashier(m_cashier);
+		m_host.addWaiter(waiter);
 		m_waiters.add(waiter);
 	}
 }

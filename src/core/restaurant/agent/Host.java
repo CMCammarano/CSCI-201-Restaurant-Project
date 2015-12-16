@@ -20,30 +20,30 @@ public class Host extends Agent {
 
 	private final List<WaiterHandler> m_waiters;
 	private final List<CustomerHandler> m_customers;
+	private final List<Table> m_tables;
 	
 	public Host(String name) {
 		super(name);
 		
 		m_waiters = Collections.synchronizedList(new ArrayList<WaiterHandler>());
 		m_customers = Collections.synchronizedList(new ArrayList<CustomerHandler>());
+		m_tables = Collections.synchronizedList(new ArrayList<Table>());
 	}
 	
 	private void customerEnteredRestaurant(Message message) {
 		Customer customer = message.get(0);
 		print("Customer " + customer.getName() + " entered the restaurant.");
-		
-		CustomerHandler c = new CustomerHandler();
-		c.customer = customer;
 		synchronized (m_customers) {
 			boolean found = false;
-			for (CustomerHandler cust : m_customers) {
-				if (cust.customer == customer) {
+			for (CustomerHandler c : m_customers) {
+				if (c.customer == customer) {
 					found = true;
 					break;
 				}
 			}
 			
-			if (!found) {
+			if (!found) {	
+				CustomerHandler c = new CustomerHandler(customer);
 				m_customers.add(c);
 			}
 		}
@@ -69,8 +69,8 @@ public class Host extends Agent {
 	}
 	
 	public void addWaiter(Waiter waiter) {
-		WaiterHandler w = new WaiterHandler();
-		w.waiter = waiter;
+		print(waiter.getName() + " came to work today.");
+		WaiterHandler w = new WaiterHandler(waiter);
 		synchronized (m_waiters) {
 			m_waiters.add(w);
 		}
@@ -79,10 +79,39 @@ public class Host extends Agent {
 	private class CustomerHandler {
 		public Customer customer;
 		public Table table;
+		
+		public CustomerHandler(Customer customer) {
+			this.customer = customer;
+		}
+		
+		public CustomerHandler(Customer customer, Table table) {
+			this.customer = customer;
+			this.table = table;
+		}
 	}
 	
 	private class WaiterHandler {
+		public int numCustomers;
+		public WaiterStateEnum state;
 		public Waiter waiter;
 		public Table table;
+		
+		public WaiterHandler(Waiter waiter) {
+			this.waiter = waiter;
+		}
+		
+		public WaiterHandler(Waiter waiter, Table table) {
+			this.waiter = waiter;
+			this.table = table;
+		}
+	}
+	
+	private enum WaiterStateEnum {
+		Idle,
+		Working
+	}
+	
+	private enum CustomerStateEnum {
+		Idle,
 	}
 }
