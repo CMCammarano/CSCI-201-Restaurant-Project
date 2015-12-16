@@ -20,8 +20,8 @@ import java.util.logging.Logger;
 public class Customer extends Agent {
 	
 	/* PRIVATE MEMBER VARIABLES */
-	private final int HUNGER_BOUNDS = 6;
-	private final float MONEY_BOUNDS = 100.0f;
+	private static final int HUNGER_BOUNDS = 6;
+	private static final float MONEY_BOUNDS = 100.0f;
 
 	private int m_hunger;
 	private float m_money;

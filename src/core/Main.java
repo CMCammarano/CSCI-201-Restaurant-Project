@@ -6,6 +6,8 @@
 package core;
 
 import core.restaurant.Restaurant;
+import gui.RestaurantGUI;
+import javax.swing.JFrame;
 
 /**
  *
@@ -13,7 +15,18 @@ import core.restaurant.Restaurant;
  */
 public class Main {
 	
+	private static final int WINDOWX = 1280;
+	private static final int WINDOWY = 720;
+	private static final int WINDOW_BOUNDS_X = 64;
+	private static final int WINDOW_BOUNDS_Y = 64;
+	
 	public static void main(String [] args) {
 		Restaurant restaurant = new Restaurant();
+		RestaurantGUI restaurantGui = new RestaurantGUI(restaurant);
+		restaurantGui.setTitle("CSCI-201 Restaurant");
+		restaurantGui.setBounds(WINDOW_BOUNDS_X, WINDOW_BOUNDS_Y, WINDOWX, WINDOWY);
+		restaurantGui.setVisible(true);
+		restaurantGui.setResizable(false);
+		restaurantGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
