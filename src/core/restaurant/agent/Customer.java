@@ -59,13 +59,23 @@ public class Customer extends Agent {
 		
 		else {
 			//m_gui.doGoToHost();
+			m_state = CustomerStateEnum.WaitingInRestaurant;
 			m_host.sendMessage("customerEnteredRestaurant", new Message(this));
 		}
 	}
 	
 	private void leaveRestaurant() {
 		print("Leaving the restaurant.");
+		m_state = CustomerStateEnum.Idle;
 		m_host.sendMessage("customerLeftRestaurant", new Message(this));
+	}
+	
+	private void followWaiter() {
+		m_state = CustomerStateEnum.Seated;
+	}
+	
+	private void chooseFood() {
+		m_state = CustomerStateEnum.Choosing;
 	}
 	
 	/* PUBLIC MEMBER METHODS */
@@ -73,13 +83,21 @@ public class Customer extends Agent {
 	public boolean update() {
 		
 		if (m_state == CustomerStateEnum.Idle && m_event == EventEnum.GotHungry) {
-			m_state = CustomerStateEnum.WaitingInRestaurant;
 			goToRestaurant();
 			return true;
 		}
 		
+		if (m_state == CustomerStateEnum.WaitingInRestaurant && m_event == EventEnum.BeingSeated) {
+			followWaiter();
+			return true;
+		}
+		
+		if (m_state == CustomerStateEnum.Seated && m_event == EventEnum.BeingSeated) {
+			chooseFood();
+			return true;
+		}
+		
 		if (m_state == CustomerStateEnum.Leaving && m_event == EventEnum.Done) {
-			m_state = CustomerStateEnum.Idle;
 			leaveRestaurant();
 			return false;
 		}
@@ -102,16 +120,10 @@ public class Customer extends Agent {
 	
 	// Messages -- Waiter
 	public void sitAtTable(Message message) {
-		Waiter waiter = message.get(0);
-		Table table = message.get(1);
-		
-		print(waiter.getName() + " took us to " + table.toString());
-		m_state = CustomerStateEnum.Seated;
-		m_event = EventEnum.Seated;
-		stateChanged();
-	}
-		
-	public void decideFood() {
+		m_waiter = message.get(0);
+		m_table = message.get(1);
+		print(m_waiter.getName() + " took us to " + m_table.toString());
+		m_event = EventEnum.BeingSeated;
 		stateChanged();
 	}
 	
@@ -152,7 +164,6 @@ public class Customer extends Agent {
 	private enum CustomerStateEnum {
 		Idle,
 		WaitingInRestaurant,
-		BeingSeated,
 		Seated,
 		Choosing,
 		Ordering,
@@ -166,8 +177,7 @@ public class Customer extends Agent {
 	private enum EventEnum {
 		None,
 		GotHungry,
-		FollowWaiter,
-		Seated,
+		BeingSeated,
 		ChoosingFood,
 		ChoseFood,
 		ReorderingFood,
