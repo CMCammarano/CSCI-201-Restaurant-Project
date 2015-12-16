@@ -30,4 +30,8 @@ public class Restaurant {
 		
 		m_waiters = new ArrayList<Waiter>();
 	}
+	
+	public void AddWaiter(String name) {
+		m_waiters.add(new Waiter(name));
+	}
 }
