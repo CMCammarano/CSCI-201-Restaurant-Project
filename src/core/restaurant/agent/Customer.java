@@ -42,6 +42,21 @@ public class Customer extends Agent {
 	}
 	
 	/* PRIVATE MEMBER METHODS */
+	private void goToRestaurant() {
+		print("Going to the restaurant.");
+		print("I have: $" + getMoney());
+		if (m_money < 5.99f) {
+			print("I can't afford anything here.");
+			m_state = CustomerStateEnum.Leaving;
+			m_event = EventEnum.DoneLeaving;
+		}
+		
+		else {
+			//m_gui.doGoToHost();
+			m_host.sendMessage("customerEnteredRestaurant", new Message(this));
+		}
+	}
+	
 	// Messages -- Host
 	private void restaurantIsFull() {
 	
@@ -77,10 +92,21 @@ public class Customer extends Agent {
 	@Override
 	public boolean update() {
 		
+		if (m_state == CustomerStateEnum.Idle && m_event == EventEnum.GotHungry ){
+			m_state = CustomerStateEnum.WaitingInRestaurant;
+			goToRestaurant();
+			return true;
+		}
 		return false;
 	}
 	
 	/* ACCESSORS AND MUTATORS */
+	public float getHunger() { return m_hunger; }
+	public void setHunger(int hunger) { m_hunger = hunger; }
+	
+	public float getMoney() { return m_money; }
+	public void setMoney(float money) { m_money = money; }
+	
 	public Host getHost() { return m_host; }
 	public void setHost(Host host) { m_host = host; }
 	

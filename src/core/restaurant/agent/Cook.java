@@ -5,10 +5,20 @@
  */
 package core.restaurant.agent;
 
+import core.agent.Agent;
+
 /**
  *
  * @author cmcammarano
  */
-public class Cook {
-	
+public class Cook extends Agent {
+
+	public Cook(String name) {
+		super(name);
+	}
+
+	@Override
+	public boolean update() {
+		return false;
+	}
 }
