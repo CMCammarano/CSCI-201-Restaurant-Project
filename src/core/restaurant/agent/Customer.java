@@ -57,9 +57,15 @@ public class Customer extends Agent {
 		}
 	}
 	
+	private void leaveRestaurant() {
+		print("Leaving the restaurant.");
+		m_host.sendMessage("customerLeftRestaurant", new Message(this));
+	}
+	
 	// Messages -- Host
 	private void restaurantIsFull() {
-	
+		print("Restaurant is full.");
+		m_state = CustomerStateEnum.Leaving;
 	}
 	
 	// Messages -- Waiter

@@ -18,9 +18,9 @@ import java.util.List;
  */
 public class Restaurant {
 	
-	private Host m_host;
-	private Cook m_cook;
-	private Cashier m_cashier;
+	private final Host m_host;
+	private final Cook m_cook;
+	private final Cashier m_cashier;
 	private final List<Waiter> m_waiters;
 	
 	public Restaurant() {
@@ -32,6 +32,9 @@ public class Restaurant {
 	}
 	
 	public void AddWaiter(String name) {
-		m_waiters.add(new Waiter(name));
+		Waiter waiter = new Waiter(name);
+		waiter.setHost(m_host);
+		waiter.setCashier(m_cashier);
+		m_waiters.add(waiter);
 	}
 }
