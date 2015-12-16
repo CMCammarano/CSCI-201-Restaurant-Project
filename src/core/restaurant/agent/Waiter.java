@@ -33,6 +33,11 @@ public class Waiter extends Agent {
 		customer.state = CustomerStateEnum.Seated;
 		customer.customer.sendMessage("sitAtTable", new Message(this, customer.table));
 	}
+	
+	private void takeCustomerOrder(CustomerHandler customer) {
+		customer.state = CustomerStateEnum.Ordered;
+		customer.customer.sendMessage("takeOrder");
+	}
 
 	@Override
 	public boolean update() {
@@ -40,6 +45,11 @@ public class Waiter extends Agent {
 			for (CustomerHandler c : m_customers) {
 				if (c.state == CustomerStateEnum.Waiting) {
 					takeCustomerToTable(c);
+					return true;
+				}
+				
+				if (c.state == CustomerStateEnum.ReadyToOrder) {
+					takeCustomerOrder(c);
 					return true;
 				}
 			}
@@ -71,6 +81,29 @@ public class Waiter extends Agent {
 		stateChanged();
 	}
 	
+	// Messages -- Customer
+	public void madeChoice(Message message) {
+		Customer customer = message.get(0);
+		
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
+				if (c.customer == customer) {
+					c.state = CustomerStateEnum.ReadyToOrder;
+				}
+			}
+		}
+		print(customer.getName() + " wants to place an order.");
+		stateChanged();
+	}
+	
+	public void placeOrder(Message message) {
+		Customer customer = message.get(0);
+		String choice = message.get(1);
+		
+		print(customer.getName() + " chose to order " + choice);
+		stateChanged();
+	}
+	
 	/* ACCESSORS AND MUTATORS */
 	public Host getHost() { return m_host; }
 	public void setHost(Host host) { m_host = host; }
@@ -96,11 +129,10 @@ public class Waiter extends Agent {
 	private enum CustomerStateEnum {
 		Waiting,
 		Seated,
-		Ready,
+		ReadyToOrder,
 		Asked,
 		Ordered,
 		WaitingForFood,
-		MustReorder,
 		HasFood,
 		Eating,
 		ReadyToPay,

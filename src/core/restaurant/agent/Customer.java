@@ -19,6 +19,7 @@ public class Customer extends Agent {
 	/* PRIVATE MEMBER VARIABLES */
 	private int m_hunger;
 	private float m_money;
+	private String m_choice;
 	private CustomerStateEnum m_state;
 	private EventEnum m_event;
 	private Host m_host;
@@ -33,6 +34,7 @@ public class Customer extends Agent {
 		Random random = new Random();
 		m_hunger = 5;
 		m_money = 20.0f;
+		m_choice = "steak";
 		m_state = CustomerStateEnum.Idle;
 		m_event = EventEnum.None;
 	}
@@ -43,6 +45,7 @@ public class Customer extends Agent {
 		Random random = new Random();
 		m_hunger = hunger;
 		m_money = money;
+		m_choice = "steak";
 		m_state = CustomerStateEnum.Idle;
 		m_event = EventEnum.None;
 	}
@@ -76,6 +79,23 @@ public class Customer extends Agent {
 	
 	private void chooseFood() {
 		m_state = CustomerStateEnum.Choosing;
+		m_waiter.sendMessage("madeChoice", new Message(this));
+	}
+	
+	private void makeOrder() {
+		m_state = CustomerStateEnum.Ordered;
+		print("I would like to order a " + m_choice);
+		m_waiter.sendMessage("placeOrder", new Message(this, m_choice));
+	}
+	
+	private void eatFood() {
+		m_state = CustomerStateEnum.Eating;
+		m_event = EventEnum.DoneEating;
+	}
+	
+	private void askForCheck() {
+		m_state = CustomerStateEnum.Paying;
+		m_waiter.sendMessage("askForCheck", new Message(this, m_choice));
 	}
 	
 	/* PUBLIC MEMBER METHODS */
@@ -97,6 +117,21 @@ public class Customer extends Agent {
 			return true;
 		}
 		
+		if (m_state == CustomerStateEnum.Choosing && m_event == EventEnum.ChoseFood) {
+			makeOrder();
+			return true;
+		}
+		
+		if (m_state == CustomerStateEnum.Ordered && m_event == EventEnum.GotFood) {
+			eatFood();
+			return true;
+		}
+		
+		if (m_state == CustomerStateEnum.Eating && m_event == EventEnum.DoneEating) {
+			askForCheck();
+			return true;
+		}
+			
 		if (m_state == CustomerStateEnum.Leaving && m_event == EventEnum.Done) {
 			leaveRestaurant();
 			return false;
@@ -127,15 +162,21 @@ public class Customer extends Agent {
 		stateChanged();
 	}
 	
-	public void reorder(Message message) {
+	public void takeOrder() {
+		print(m_waiter.getName() + " is taking our order.");
+		m_event = EventEnum.ChoseFood;
 		stateChanged();
 	}
 	
-	public void receiveFood(Message message) {
+	public void receiveFood() {
+		print(m_waiter.getName() + " brought us our " + m_choice);
+		m_event = EventEnum.GotFood;
 		stateChanged();
 	}
 	
 	public void receiveCheck() {
+		print(m_waiter.getName() + " brought us our check.");
+		m_event = EventEnum.GotCheck;
 		stateChanged();
 	}
 	
@@ -166,7 +207,7 @@ public class Customer extends Agent {
 		WaitingInRestaurant,
 		Seated,
 		Choosing,
-		Ordering,
+		Ordered,
 		Eating,
 		DoneEating,
 		AskForCheck,
@@ -178,10 +219,7 @@ public class Customer extends Agent {
 		None,
 		GotHungry,
 		BeingSeated,
-		ChoosingFood,
 		ChoseFood,
-		ReorderingFood,
-		ReorderedFood,
 		GotFood,
 		DoneEating,
 		GotCheck,
