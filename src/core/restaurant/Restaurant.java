@@ -48,7 +48,7 @@ public class Restaurant {
 		AddWaiter("Waiter1");
 		//AddWaiter("Waiter2");
 		AddCustomer("Customer1");
-		//AddCustomer("Customer2");
+		AddCustomer("Customer2");
 	}
 	
 	public void AddWaiter(String name) {

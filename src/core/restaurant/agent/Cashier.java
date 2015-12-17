@@ -58,7 +58,6 @@ public class Cashier extends Agent {
 			}
 		}
 		
-		/*
 		synchronized (m_checks) {
 			for (Check c : m_checks) {
 				if (c.getStatus() == CheckStatusEnum.Paid) {
@@ -67,7 +66,6 @@ public class Cashier extends Agent {
 				}
 			}
 		}
-		*/
 		
 		return false;
 	}
@@ -76,9 +74,7 @@ public class Cashier extends Agent {
 		Waiter waiter = message.get(0);
 		Customer customer = message.get(1);
 		String choice = message.get(2);
-		synchronized (m_checks) {
-			m_checks.add(new Check(waiter, customer, choice));
-		}
+		m_checks.add(new Check(waiter, customer, choice));
 		
 		print("Computing " + customer.getName() + "'s check for his/her " + choice + ".");
 		stateChanged();
@@ -88,12 +84,10 @@ public class Cashier extends Agent {
 		Customer customer = message.get(0);
 		float amountPaid = message.get(1);
 		float cost = 0;
-		synchronized (m_checks) {
-			for (Check c : m_checks) {
-				if (c.getCustomer() == customer) {
-					c.setStatus(CheckStatusEnum.Received);
-					c.setChange(amountPaid - cost);
-				}
+		for (Check c : m_checks) {
+			if (c.getCustomer() == customer) {
+				c.setStatus(CheckStatusEnum.Received);
+				c.setChange(amountPaid - cost);
 			}
 		}
 		

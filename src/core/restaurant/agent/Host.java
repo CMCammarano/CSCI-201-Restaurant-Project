@@ -88,19 +88,18 @@ public class Host extends Agent {
 	public void customerEnteredRestaurant(Message message) {
 		Customer customer = message.get(0);
 		print("Customer " + customer.getName() + " entered the restaurant.");
-		synchronized (m_customers) {
-			boolean found = false;
-			for (CustomerHandler c : m_customers) {
-				if (c.customer == customer) {
-					found = true;
-					break;
-				}
+		
+		boolean found = false;
+		for (CustomerHandler c : m_customers) {
+			if (c.customer == customer) {
+				found = true;
+				break;
 			}
-			
-			if (!found) {	
-				CustomerHandler c = new CustomerHandler(customer);
-				m_customers.add(c);
-			}
+		}
+
+		if (!found) {	
+			CustomerHandler c = new CustomerHandler(customer);
+			m_customers.add(c);
 		}
 		
 		stateChanged();
@@ -110,20 +109,16 @@ public class Host extends Agent {
 		Customer customer = message.get(0);
 		print("Customer " + customer.getName() + " left the restaurant.");
 		
-		synchronized (m_customers) {
-			for (CustomerHandler cust : m_customers) {
-				if (cust.customer == customer) {
-					m_customers.remove(cust);
-					break;
-				}
+		for (CustomerHandler cust : m_customers) {
+			if (cust.customer == customer) {
+				m_customers.remove(cust);
+				break;
 			}
 		}
 		
-		synchronized (m_tables) {
-			for (Table table : m_tables) {
-				if (table.getOccupant() == customer) {
-					table.removeOccupant();
-				}
+		for (Table table : m_tables) {
+			if (table.getOccupant() == customer) {
+				table.removeOccupant();
 			}
 		}
 		

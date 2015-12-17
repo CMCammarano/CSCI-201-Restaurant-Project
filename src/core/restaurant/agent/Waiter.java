@@ -27,7 +27,6 @@ public class Waiter extends Agent {
 	
 	public Waiter(String name) {
 		super(name);
-		
 		m_customers = Collections.synchronizedList(new ArrayList<CustomerHandler>());
 	}
 	
@@ -121,12 +120,14 @@ public class Waiter extends Agent {
 			}
 		}
 				
-				/*
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
 				if (c.state == CustomerStateEnum.Paid) {
 					m_customers.remove(c);
 					return true;
 				}
-				*/
+			}
+		}
 		
 		return false;
 	}
@@ -136,19 +137,17 @@ public class Waiter extends Agent {
 		Customer customer = message.get(0);
 		Table table = message.get(1);
 		
-		synchronized (m_customers) {
-			boolean found = false;
-			for (CustomerHandler c : m_customers) {
-				if (c.customer == customer) {
-					found = true;
-					break;
-				}
+		boolean found = false;
+		for (CustomerHandler c : m_customers) {
+			if (c.customer == customer) {
+				found = true;
+				break;
 			}
-			
-			if (!found) {
-				CustomerHandler c = new CustomerHandler(customer, table);
-				m_customers.add(c);
-			}
+		}
+
+		if (!found) {
+			CustomerHandler c = new CustomerHandler(customer, table);
+			m_customers.add(c);
 		}
 		
 		print("Seating customer " + customer.getName() + " at " + table.toString() + ".");
@@ -158,14 +157,13 @@ public class Waiter extends Agent {
 	// Messages -- Customer
 	public void madeChoice(Message message) {
 		Customer customer = message.get(0);
-		synchronized (m_customers) {
-			for (CustomerHandler c : m_customers) {
-				if (c.customer == customer) {
-					c.state = CustomerStateEnum.ReadyToOrder;
-					break;
-				}
+		for (CustomerHandler c : m_customers) {
+			if (c.customer == customer) {
+				c.state = CustomerStateEnum.ReadyToOrder;
+				break;
 			}
 		}
+		
 		print(customer.getName() + " wants to place an order.");
 		stateChanged();
 	}
@@ -173,13 +171,11 @@ public class Waiter extends Agent {
 	public void placeOrder(Message message) {
 		Customer customer = message.get(0);
 		String choice = message.get(1);
-		synchronized (m_customers) {
-			for (CustomerHandler c : m_customers) {
-				if (c.customer == customer) {
-					c.state = CustomerStateEnum.Ordered;
-					c.choice = choice;
-					break;
-				}
+		for (CustomerHandler c : m_customers) {
+			if (c.customer == customer) {
+				c.state = CustomerStateEnum.Ordered;
+				c.choice = choice;
+				break;
 			}
 		}
 		
@@ -189,12 +185,10 @@ public class Waiter extends Agent {
 	
 	public void askForCheck(Message message) {
 		Customer customer = message.get(0);
-		synchronized (m_customers) {
-			for (CustomerHandler c : m_customers) {
-				if (c.customer == customer) {
-					c.state = CustomerStateEnum.ReadyToReceiveCheck;
-					break;
-				}
+		for (CustomerHandler c : m_customers) {
+			if (c.customer == customer) {
+				c.state = CustomerStateEnum.ReadyToReceiveCheck;
+				break;
 			}
 		}
 		
@@ -205,13 +199,12 @@ public class Waiter extends Agent {
 	// Messages -- Cashier
 	public void pickupCheck(Message message) {
 		Check check = message.get(0);
-		synchronized (m_customers) {
-			for (CustomerHandler c : m_customers) {
-				if (c.customer == check.getCustomer()) {
-					c.state = CustomerStateEnum.ReadyToPay;
-				}
+		for (CustomerHandler c : m_customers) {
+			if (c.customer == check.getCustomer()) {
+				c.state = CustomerStateEnum.ReadyToPay;
 			}
 		}
+		
 		print("Picking " + check.getCustomer().getName() + "'s check up from the cashier.");
 		stateChanged();
 	}
@@ -219,16 +212,14 @@ public class Waiter extends Agent {
 	// Messages -- Cook
 	public void pickupOrder(Message message) {
 		Order order = message.get(0);
-		print("Picked up order of " + order.getChoice() + " from the cook.");
-
-		synchronized (m_customers) {
-			for (CustomerHandler c : m_customers) {
-				if (c.customer == order.getCustomer()) {
-					c.state = CustomerStateEnum.WaitingForFood;
-					break;
-				}
+		for (CustomerHandler c : m_customers) {
+			if (c.customer == order.getCustomer()) {
+				c.state = CustomerStateEnum.WaitingForFood;
+				break;
 			}
 		}
+		
+		print("Picked up " + order.getCustomer().getName() + "'s " + order.getChoice() + " from the cook.");
 		stateChanged();
 	}
 	
