@@ -7,6 +7,7 @@ package core.restaurant.agent;
 
 import core.agent.Agent;
 import core.agent.Message;
+import core.restaurant.Check;
 import core.restaurant.Order;
 import core.restaurant.Table;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class Waiter extends Agent {
 	}
 	
 	private void bringFoodToCustomer(CustomerHandler customer) {
-		print("Bringing " + customer.choice + " to " + customer.customer.getName());
+		print("Bringing " + customer.choice + " to " + customer.customer.getName() + ".");
 		customer.state = CustomerStateEnum.Eating;
 		customer.customer.sendMessage("receiveFood");
 	}
@@ -55,7 +56,18 @@ public class Waiter extends Agent {
 	private void getCheckFromCashier(CustomerHandler customer) {
 		print("Getting check for " + customer.choice + " from the cashier.");
 		customer.state = CustomerStateEnum.WaitingForCashier;
-		m_cashier.sendMessage("computeCheck", new Message(customer.choice));
+		m_cashier.sendMessage("computeCheck", new Message(this, customer.customer, customer.choice));
+	}
+	
+	private void bringCheckToCustomer(CustomerHandler customer) {
+		print("Bringing " + customer.customer.getName() + " his or her check.");
+		customer.state = CustomerStateEnum.Paid;
+		
+		synchronized(m_customers) {
+			m_customers.remove(customer);
+		}
+		
+		customer.customer.sendMessage("receiveCheck");
 	}
 
 	@Override
@@ -86,6 +98,11 @@ public class Waiter extends Agent {
 					getCheckFromCashier(c);
 					return true;
 				}
+				
+				if (c.state == CustomerStateEnum.ReadyToPay) {
+					bringCheckToCustomer(c);
+					return true;
+				}
 			}
 		}
 		return false;
@@ -111,7 +128,7 @@ public class Waiter extends Agent {
 			}
 		}
 		
-		print("Seating customer " + customer.getName() + " at " + table.toString());
+		print("Seating customer " + customer.getName() + " at " + table.toString() + ".");
 		stateChanged();
 	}
 	
@@ -143,7 +160,7 @@ public class Waiter extends Agent {
 			}
 		}
 		
-		print(customer.getName() + " chose to order " + choice);
+		print(customer.getName() + " chose to order " + choice + ".");
 		stateChanged();
 	}
 	
@@ -159,6 +176,20 @@ public class Waiter extends Agent {
 		}
 		
 		print(customer.getName() + " asked us for his/her check.");
+		stateChanged();
+	}
+	
+	// Messages -- Cashier
+	public void pickupCheck(Message message) {
+		Check check = message.get(0);
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
+				if (c.customer == check.getCustomer()) {
+					c.state = CustomerStateEnum.ReadyToPay;
+				}
+			}
+		}
+		print("Picking " + check.getCustomer().getName() + "'s check up from the cashier.");
 		stateChanged();
 	}
 	

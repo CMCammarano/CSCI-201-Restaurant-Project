@@ -29,12 +29,12 @@ public class Cook extends Agent {
 	
 	private void cookOrder(Order order) {
 		order.setStatus(OrderStatusEnum.Cooking);
-		print("Starting to cook " + order.getChoice());
+		print("Starting to cook " + order.getChoice() + ".");
 		
 		// TODO: Implement cooking
 		
 		order.setStatus(OrderStatusEnum.Finished);
-		print("Finished cooking " + order.getChoice());
+		print("Finished cooking " + order.getChoice() + ".");
 		order.getWaiter().sendMessage("pickupOrder", new Message(order));
 	}
 
@@ -53,7 +53,7 @@ public class Cook extends Agent {
 	
 	public void takeOrder(Message message) {
 		Order order = message.get(0);
-		print("Cooking an order of " + order.getChoice() + " for " + order.getCustomer().getName() + " served by waiter " + order.getWaiter().getName());
+		print("Cooking an order of " + order.getChoice() + " for " + order.getCustomer().getName() + " served by waiter " + order.getWaiter().getName() + ".");
 		
 		synchronized (m_orders) {
 			if (!m_orders.contains(order)) {

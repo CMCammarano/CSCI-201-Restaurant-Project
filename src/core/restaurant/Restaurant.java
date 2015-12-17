@@ -45,8 +45,8 @@ public class Restaurant {
 		m_cashier.startThread();
 		
 		// FOR INITIAL TESTING
-		AddWaiter("Jeff");
-		AddCustomer("George");
+		AddWaiter("Waiter1");
+		AddCustomer("Customer1");
 	}
 	
 	public void AddWaiter(String name) {

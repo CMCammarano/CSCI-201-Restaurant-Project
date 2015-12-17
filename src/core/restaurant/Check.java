@@ -5,22 +5,41 @@
  */
 package core.restaurant;
 
+import core.restaurant.agent.Customer;
+import core.restaurant.agent.Waiter;
+
 /**
  *
  * @author cmcammarano
  */
 public class Check {
-	private float m_bill;
+	private Waiter m_waiter;
+	private Customer m_customer;
 	private String m_choice;
-	
-	public Check(float bill, String choice) {
-		m_bill = bill;
+	private CheckStatusEnum m_status;
+
+	public Check(Waiter waiter, Customer customer, String choice) {
+		m_waiter = waiter;
+		m_customer = customer;
 		m_choice = choice;
+		m_status = CheckStatusEnum.Created;
 	}
 	
-	public float getBill() { return m_bill; }
-	public void setBill(float bill) { m_bill = bill; }
+	public Waiter getWaiter() { return m_waiter; }
+	public void setWaiter(Waiter waiter) { m_waiter = waiter; }
+	
+	public Customer getCustomer() { return m_customer; }
+	public void setCustomer(Customer customer) { m_customer = customer; }
 	
 	public String getChoice() { return m_choice; }
 	public void setChoice(String choice) { m_choice = choice; }
+	
+	public CheckStatusEnum getStatus() { return m_status; }
+	public void setStatus(CheckStatusEnum status) { m_status = status; }
+	
+	public enum CheckStatusEnum {
+		Created,
+		Sent,
+		Paid
+	}
 }
