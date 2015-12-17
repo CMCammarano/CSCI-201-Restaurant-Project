@@ -99,7 +99,7 @@ public class Customer extends Agent {
 	}
 	
 	private void payForMeal() {
-		m_state = CustomerStateEnum.Paying;
+		m_state = CustomerStateEnum.Leaving;
 		
 		float amountToPay = 10.0f;
 		m_money -= amountToPay;
@@ -197,6 +197,11 @@ public class Customer extends Agent {
 	
 	// Messages -- Cashier
 	public void receiveChange(Message message) {
+		float change = message.get(0);
+		m_money += change;
+		m_event = EventEnum.Done;
+		
+		print("Received $" + change + " from the cashier.");
 		stateChanged();
 	}
 	
@@ -226,7 +231,6 @@ public class Customer extends Agent {
 		Eating,
 		DoneEating,
 		AskForCheck,
-		Paying,
 		Leaving
 	}
 	
