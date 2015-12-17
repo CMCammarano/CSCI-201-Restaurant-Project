@@ -74,6 +74,9 @@ public class Restaurant {
 		m_waiters.add(waiter);
 	}
 	
+	public List<Customer> getCustomers() { return m_customers; }
+	public List<Waiter> getWaiters() { return m_waiters; }
+	
 	public void AddCustomer(String name) {
 		Customer customer = new Customer(name);
 		customer.setHost(m_host);
