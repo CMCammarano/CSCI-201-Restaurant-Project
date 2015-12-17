@@ -42,8 +42,20 @@ public class Waiter extends Agent {
 	
 	private void sendOrderToCook(CustomerHandler customer) {
 		print("Taking this order of " + customer.choice + " to the cook.");
-		customer.state = CustomerStateEnum.WaitingForFood;
+		customer.state = CustomerStateEnum.WaitingForOrder;
 		m_cook.sendMessage("takeOrder", new Message(new Order(this, customer.customer, customer.choice)));
+	}
+	
+	private void bringFoodToCustomer(CustomerHandler customer) {
+		print("Bringing " + customer.choice + " to " + customer.customer.getName());
+		customer.state = CustomerStateEnum.Eating;
+		customer.customer.sendMessage("receiveFood");
+	}
+	
+	private void getCheckFromCashier(CustomerHandler customer) {
+		print("Getting check for " + customer.choice + " from the cashier.");
+		customer.state = CustomerStateEnum.WaitingForCashier;
+		m_cashier.sendMessage("computeCheck", new Message(customer.choice));
 	}
 
 	@Override
@@ -62,6 +74,16 @@ public class Waiter extends Agent {
 				
 				if (c.state == CustomerStateEnum.Ordered) {
 					sendOrderToCook(c);
+					return true;
+				}
+				
+				if (c.state == CustomerStateEnum.WaitingForFood) {
+					bringFoodToCustomer(c);
+					return true;
+				}
+				
+				if (c.state == CustomerStateEnum.ReadyToReceiveCheck) {
+					getCheckFromCashier(c);
 					return true;
 				}
 			}
@@ -100,6 +122,7 @@ public class Waiter extends Agent {
 			for (CustomerHandler c : m_customers) {
 				if (c.customer == customer) {
 					c.state = CustomerStateEnum.ReadyToOrder;
+					break;
 				}
 			}
 		}
@@ -115,6 +138,7 @@ public class Waiter extends Agent {
 				if (c.customer == customer) {
 					c.state = CustomerStateEnum.Ordered;
 					c.choice = choice;
+					break;
 				}
 			}
 		}
@@ -123,12 +147,37 @@ public class Waiter extends Agent {
 		stateChanged();
 	}
 	
-	public void pickupOrder(Message message) {
-		Order order = message.get(0);
+	public void askForCheck(Message message) {
+		Customer customer = message.get(0);
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
+				if (c.customer == customer) {
+					c.state = CustomerStateEnum.ReadyToReceiveCheck;
+					break;
+				}
+			}
+		}
 		
-		print("Picked up order of " + order.getChoice() + " from the cook.");
+		print(customer.getName() + " asked us for his/her check.");
 		stateChanged();
 	}
+	
+	// Messages -- Cook
+	public void pickupOrder(Message message) {
+		Order order = message.get(0);
+		print("Picked up order of " + order.getChoice() + " from the cook.");
+
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
+				if (c.customer == order.getCustomer()) {
+					c.state = CustomerStateEnum.WaitingForFood;
+					break;
+				}
+			}
+		}
+		stateChanged();
+	}
+	
 	/* ACCESSORS AND MUTATORS */
 	public Host getHost() { return m_host; }
 	public void setHost(Host host) { m_host = host; }
@@ -158,6 +207,7 @@ public class Waiter extends Agent {
 		ReadyToOrder,
 		Ordering,
 		Ordered,
+		WaitingForOrder,
 		WaitingForFood,
 		HasFood,
 		Eating,

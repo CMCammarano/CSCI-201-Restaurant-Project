@@ -6,6 +6,7 @@
 package core.restaurant.agent;
 
 import core.agent.Agent;
+import core.agent.Message;
 
 /**
  *
@@ -20,5 +21,9 @@ public class Cashier extends Agent {
 	@Override
 	public boolean update() {
 		return false;
+	}
+	
+	public void computeCheck(Message message) {
+		
 	}
 }

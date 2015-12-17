@@ -95,7 +95,7 @@ public class Customer extends Agent {
 	
 	private void askForCheck() {
 		m_state = CustomerStateEnum.Paying;
-		m_waiter.sendMessage("askForCheck", new Message(this, m_choice));
+		m_waiter.sendMessage("askForCheck", new Message(this));
 	}
 	
 	/* PUBLIC MEMBER METHODS */
@@ -157,6 +157,8 @@ public class Customer extends Agent {
 	public void sitAtTable(Message message) {
 		m_waiter = message.get(0);
 		m_table = message.get(1);
+		m_table.setOccupant(this);
+		
 		print(m_waiter.getName() + " took us to " + m_table.toString());
 		m_event = EventEnum.BeingSeated;
 		stateChanged();
