@@ -55,10 +55,12 @@ public class Restaurant {
 	
 		// FOR INITIAL TESTING
 		AddWaiter("Waiter1");
-		//AddWaiter("Waiter2");
+		AddWaiter("Waiter2");
 		AddCustomer("Customer1");
 		AddCustomer("Customer2");
 		AddCustomer("Customer3");
+		AddCustomer("Customer4");
+		AddCustomer("Customer5");
 	}
 	
 	public void AddWaiter(String name) {
