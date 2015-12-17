@@ -94,8 +94,16 @@ public class Customer extends Agent {
 	}
 	
 	private void askForCheck() {
-		m_state = CustomerStateEnum.Paying;
+		m_state = CustomerStateEnum.AskForCheck;
 		m_waiter.sendMessage("askForCheck", new Message(this));
+	}
+	
+	private void payForMeal() {
+		m_state = CustomerStateEnum.Paying;
+		
+		float amountToPay = 10.0f;
+		m_money -= amountToPay;
+		m_cashier.sendMessage("payForMeal", new Message(this, amountToPay));
 	}
 	
 	/* PUBLIC MEMBER METHODS */
@@ -129,6 +137,11 @@ public class Customer extends Agent {
 		
 		if (m_state == CustomerStateEnum.Eating && m_event == EventEnum.DoneEating) {
 			askForCheck();
+			return true;
+		}
+		
+		if (m_state == CustomerStateEnum.AskForCheck && m_event == EventEnum.GotCheck) {
+			payForMeal();
 			return true;
 		}
 			

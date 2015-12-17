@@ -26,10 +26,16 @@ public class Cashier extends Agent {
 		m_checks = Collections.synchronizedList(new ArrayList<Check>());
 	}	
 
-	private void computeCustomerCheck(Check c) {
-		print("Tabulating " + c.getCustomer().getName() + "'s check.");
-		c.setStatus(CheckStatusEnum.Sent);
-		c.getWaiter().sendMessage("pickupCheck", new Message(c));
+	private void computeCustomerCheck(Check check) {
+		print("Tabulating " + check.getCustomer().getName() + "'s check.");
+		check.setStatus(CheckStatusEnum.Sent);
+		check.getWaiter().sendMessage("pickupCheck", new Message(check));
+	}
+	
+	private void calculateChange(Check check) {
+		print("Calculating change for " + check.getCustomer().getName() + ".");
+		check.setStatus(CheckStatusEnum.Paid);
+		check.getCustomer().sendMessage("receiveChange", new Message(check.getChange()));
 	}
 	
 	@Override
@@ -38,6 +44,17 @@ public class Cashier extends Agent {
 			for (Check c : m_checks) {
 				if (c.getStatus() == CheckStatusEnum.Created) {
 					computeCustomerCheck(c);
+					return true;
+				}
+				
+				if (c.getStatus() == CheckStatusEnum.Received) {
+					calculateChange(c);
+					return true;
+				}
+				
+				if (c.getStatus() == CheckStatusEnum.Paid) {
+					m_checks.remove(c);
+					return true;
 				}
 			}
 		}
@@ -54,6 +71,23 @@ public class Cashier extends Agent {
 		}
 		
 		print("Computing " + customer.getName() + "'s check for his/her " + choice + ".");
+		stateChanged();
+	}
+	
+	public void payForMeal(Message message) {
+		Customer customer = message.get(0);
+		float amountPaid = message.get(1);
+		float cost = 0;
+		synchronized (m_checks) {
+			for (Check c : m_checks) {
+				if (c.getCustomer() == customer) {
+					c.setStatus(CheckStatusEnum.Received);
+					c.setChange(amountPaid - cost);
+				}
+			}
+		}
+		
+		print(customer.getName() + " is paying for his/her meal.");
 		stateChanged();
 	}
 }
