@@ -11,6 +11,7 @@ import core.restaurant.Check;
 import core.restaurant.Check.CheckStatusEnum;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,10 +21,12 @@ import java.util.List;
 public class Cashier extends Agent {
 
 	private final List<Check> m_checks;
+	private final HashMap<String, Float> m_menu;
 	
-	public Cashier(String name) {
+	public Cashier(String name, HashMap<String, Float> menu) {
 		super(name);
 		m_checks = Collections.synchronizedList(new ArrayList<Check>());
+		m_menu = menu;
 	}	
 
 	private void computeCustomerCheck(Check check) {
@@ -83,10 +86,10 @@ public class Cashier extends Agent {
 	public void payForMeal(Message message) {
 		Customer customer = message.get(0);
 		float amountPaid = message.get(1);
-		float cost = 0;
 		for (Check c : m_checks) {
 			if (c.getCustomer() == customer) {
 				c.setStatus(CheckStatusEnum.Received);
+				float cost = m_menu.get(c.getChoice());
 				c.setChange(amountPaid - cost);
 			}
 		}

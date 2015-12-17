@@ -10,6 +10,7 @@ import core.agent.Message;
 import core.restaurant.Table;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -21,13 +22,15 @@ public class Host extends Agent {
 	private final List<WaiterHandler> m_waiters;
 	private final List<CustomerHandler> m_customers;
 	private final List<Table> m_tables;
+	private final HashMap<String, Float> m_menu;
 	
-	public Host(String name, List<Table> tables) {
+	public Host(String name, List<Table> tables, HashMap<String, Float> menu) {
 		super(name);
 		
 		m_waiters = Collections.synchronizedList(new ArrayList<WaiterHandler>());
 		m_customers = Collections.synchronizedList(new ArrayList<CustomerHandler>());
 		m_tables = Collections.synchronizedList(tables);
+		m_menu = menu;
 	}
 	
 	/* PRIVATE MEMBER METHODS */
@@ -127,10 +130,10 @@ public class Host extends Agent {
 	
 	public void addWaiter(Waiter waiter) {
 		print(waiter.getName() + " came to work today.");
+		
+		waiter.setMenu(m_menu);
 		WaiterHandler w = new WaiterHandler(waiter);
-		synchronized (m_waiters) {
-			m_waiters.add(w);
-		}
+		m_waiters.add(w);
 	}
 	
 	private class CustomerHandler {

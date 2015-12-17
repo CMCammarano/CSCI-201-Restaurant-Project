@@ -11,6 +11,7 @@ import core.restaurant.agent.Customer;
 import core.restaurant.agent.Host;
 import core.restaurant.agent.Waiter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ public class Restaurant {
 	private final List<Waiter> m_waiters;
 	private final List<Customer> m_customers;
 	private final List<Table> m_tables;
+	private final HashMap<String, Float> m_menu;
 	
 	public Restaurant() {
 		m_waiters = new ArrayList<Waiter>();
@@ -35,20 +37,28 @@ public class Restaurant {
 			m_tables.add(new Table(i + 1, i, i));
 		}
 		
-		m_host = new Host("Host", m_tables);
-		m_cook = new Cook("Cook");
-		m_cashier = new Cashier("Cashier");
+		m_menu = new HashMap<String, Float>();
+		m_menu.put("steak", 10.99f);
+		m_menu.put("chicken", 8.99f);
+		m_menu.put("salad", 5.99f);
+		m_menu.put("burger", 9.99f);
+		m_menu.put("pizza", 7.99f);
 		
-		// Start agent threads
+		m_host = new Host("Host", m_tables, m_menu);
 		m_host.startThread();
-		m_cook.startThread();
-		m_cashier.startThread();
 		
+		m_cook = new Cook("Cook");
+		m_cook.startThread();
+		
+		m_cashier = new Cashier("Cashier", m_menu);
+		m_cashier.startThread();
+	
 		// FOR INITIAL TESTING
 		AddWaiter("Waiter1");
 		//AddWaiter("Waiter2");
 		AddCustomer("Customer1");
 		AddCustomer("Customer2");
+		AddCustomer("Customer3");
 	}
 	
 	public void AddWaiter(String name) {

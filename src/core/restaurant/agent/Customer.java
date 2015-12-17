@@ -8,6 +8,8 @@ package core.restaurant.agent;
 import core.agent.Agent;
 import core.agent.Message;
 import core.restaurant.Table;
+import gui.agents.CustomerGUI;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -26,6 +28,10 @@ public class Customer extends Agent {
 	private Waiter m_waiter;
 	private Cashier m_cashier;
 	private Table m_table;
+	private HashMap<String, Float> m_menu;
+	
+	// GUI
+	private CustomerGUI m_gui;
 	
 	/* CONSTRUCTOR */
 	public Customer(String name) {
@@ -34,7 +40,7 @@ public class Customer extends Agent {
 		Random random = new Random();
 		m_hunger = 5;
 		m_money = 20.0f;
-		m_choice = "steak";
+		m_choice = "";
 		m_state = CustomerStateEnum.Idle;
 		m_event = EventEnum.None;
 	}
@@ -45,7 +51,7 @@ public class Customer extends Agent {
 		Random random = new Random();
 		m_hunger = hunger;
 		m_money = money;
-		m_choice = "steak";
+		m_choice = "";
 		m_state = CustomerStateEnum.Idle;
 		m_event = EventEnum.None;
 	}
@@ -70,6 +76,7 @@ public class Customer extends Agent {
 	private void leaveRestaurant() {
 		print("Leaving the restaurant.");
 		m_state = CustomerStateEnum.Idle;
+		m_choice = "";
 		m_host.sendMessage("customerLeftRestaurant", new Message(this));
 	}
 	
@@ -79,6 +86,39 @@ public class Customer extends Agent {
 	
 	private void chooseFood() {
 		m_state = CustomerStateEnum.Choosing;
+		
+		while (m_choice.equals("")) {
+			Random random = new Random();
+			int decision = random.nextInt(5);
+			switch (decision) {
+				case 0:
+					if (m_money > m_menu.get("steak")) {
+						m_choice = "steak";
+					}
+					break;			
+				case 1:
+					if (m_money > m_menu.get("chicken")) {
+						m_choice = "chicken";
+					}
+					break;
+				case 2:
+					if (m_money > m_menu.get("salad")) {
+						m_choice = "salad";
+					}
+					break;
+				case 3:
+					if (m_money > m_menu.get("burger")) {
+						m_choice = "burger";
+					}
+					break;
+				case 4:
+					if (m_money > m_menu.get("pizza")) {
+						m_choice = "pizza";
+					}
+					break;
+			}
+		}
+		
 		m_waiter.sendMessage("madeChoice", new Message(this));
 	}
 	
@@ -100,8 +140,17 @@ public class Customer extends Agent {
 	
 	private void payForMeal() {
 		m_state = CustomerStateEnum.Leaving;
+		float amountToPay = 0;
 		
-		float amountToPay = 10.0f;
+		Random random = new Random();
+		int decision = random.nextInt(2);
+		if (decision == 1 && m_money > 15.0f) {
+			amountToPay = 15.0f;
+		}
+		
+		else {
+			amountToPay = m_menu.get(m_choice);
+		}
 		m_money -= amountToPay;
 		m_cashier.sendMessage("payForMeal", new Message(this, amountToPay));
 	}
@@ -170,26 +219,27 @@ public class Customer extends Agent {
 	public void sitAtTable(Message message) {
 		m_waiter = message.get(0);
 		m_table = message.get(1);
+		m_menu = message.get(2);
 		
-		print(m_waiter.getName() + " took us to " + m_table.toString());
+		print(m_waiter.getName() + " took me to " + m_table.toString());
 		m_event = EventEnum.BeingSeated;
 		stateChanged();
 	}
 	
 	public void takeOrder() {
-		print(m_waiter.getName() + " is taking our order.");
+		print(m_waiter.getName() + " is taking my order.");
 		m_event = EventEnum.ChoseFood;
 		stateChanged();
 	}
 	
 	public void receiveFood() {
-		print(m_waiter.getName() + " brought us our " + m_choice);
+		print(m_waiter.getName() + " brought me my " + m_choice);
 		m_event = EventEnum.GotFood;
 		stateChanged();
 	}
 	
 	public void receiveCheck() {
-		print(m_waiter.getName() + " brought us our check.");
+		print(m_waiter.getName() + " brought me my check.");
 		m_event = EventEnum.GotCheck;
 		stateChanged();
 	}

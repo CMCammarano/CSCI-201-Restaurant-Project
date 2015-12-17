@@ -23,7 +23,6 @@ public class Cook extends Agent {
 	
 	public Cook(String name) {
 		super(name);
-		
 		m_orders = Collections.synchronizedList(new ArrayList<Order>());
 	}
 	

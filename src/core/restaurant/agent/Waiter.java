@@ -12,6 +12,7 @@ import core.restaurant.Order;
 import core.restaurant.Table;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,6 +25,7 @@ public class Waiter extends Agent {
 	private Cashier m_cashier;
 	private Cook m_cook;
 	private final List<CustomerHandler> m_customers;
+	private HashMap<String, Float> m_menu;
 	
 	public Waiter(String name) {
 		super(name);
@@ -32,7 +34,7 @@ public class Waiter extends Agent {
 	
 	private void takeCustomerToTable(CustomerHandler customer) {
 		customer.state = CustomerStateEnum.Seated;
-		customer.customer.sendMessage("sitAtTable", new Message(this, customer.table));
+		customer.customer.sendMessage("sitAtTable", new Message(this, customer.table, m_menu));
 	}
 	
 	private void takeCustomerOrder(CustomerHandler customer) {
@@ -232,6 +234,8 @@ public class Waiter extends Agent {
 	
 	public Cook getCook() { return m_cook; }
 	public void setCook(Cook cook) { m_cook = cook; }
+	
+	public void setMenu(HashMap<String, Float> menu) { m_menu = menu; }
 	
 	private class CustomerHandler {
 		public Customer customer;
