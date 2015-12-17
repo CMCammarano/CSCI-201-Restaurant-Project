@@ -170,7 +170,6 @@ public class Customer extends Agent {
 	public void sitAtTable(Message message) {
 		m_waiter = message.get(0);
 		m_table = message.get(1);
-		m_table.setOccupant(this);
 		
 		print(m_waiter.getName() + " took us to " + m_table.toString());
 		m_event = EventEnum.BeingSeated;

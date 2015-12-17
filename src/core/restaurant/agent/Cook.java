@@ -29,21 +29,30 @@ public class Cook extends Agent {
 	
 	private void cookOrder(Order order) {
 		order.setStatus(OrderStatusEnum.Cooking);
-		print("Starting to cook " + order.getChoice() + ".");
-		
-		// TODO: Implement cooking
-		
+		print("Cooking " + order.getChoice() + ".");
+	}
+	
+	private void callWaiter(Order order) {
+		print("Calling " + order.getWaiter().getName() + " to pickup the order.");
 		order.setStatus(OrderStatusEnum.Finished);
-		print("Finished cooking " + order.getChoice() + ".");
 		order.getWaiter().sendMessage("pickupOrder", new Message(order));
 	}
 
 	@Override
 	public boolean update() {
 		synchronized (m_orders) {
-			for (Order o : m_orders) {
+			for (Order o : m_orders) {				
 				if (o.getStatus() == OrderStatusEnum.Started) {
 					cookOrder(o);
+					return true;
+				}
+			}
+		}
+		
+		synchronized (m_orders) {
+			for (Order o : m_orders) {	
+				if (o.getStatus() == OrderStatusEnum.Cooking) {
+					callWaiter(o);
 					return true;
 				}
 			}
@@ -56,9 +65,7 @@ public class Cook extends Agent {
 		print("Cooking an order of " + order.getChoice() + " for " + order.getCustomer().getName() + " served by waiter " + order.getWaiter().getName() + ".");
 		
 		synchronized (m_orders) {
-			if (!m_orders.contains(order)) {
-				m_orders.add(order);
-			}
+			m_orders.add(order);
 		}
 		stateChanged();
 	}

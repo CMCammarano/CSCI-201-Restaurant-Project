@@ -23,7 +23,7 @@ public class Waiter extends Agent {
 	private Host m_host;
 	private Cashier m_cashier;
 	private Cook m_cook;
-	private List<CustomerHandler> m_customers;
+	private final List<CustomerHandler> m_customers;
 	
 	public Waiter(String name) {
 		super(name);
@@ -42,7 +42,7 @@ public class Waiter extends Agent {
 	}
 	
 	private void sendOrderToCook(CustomerHandler customer) {
-		print("Taking this order of " + customer.choice + " to the cook.");
+		print("Taking " + customer.customer.getName() + "'s order of " + customer.choice + " to the cook.");
 		customer.state = CustomerStateEnum.WaitingForOrder;
 		m_cook.sendMessage("takeOrder", new Message(new Order(this, customer.customer, customer.choice)));
 	}
@@ -54,7 +54,7 @@ public class Waiter extends Agent {
 	}
 	
 	private void getCheckFromCashier(CustomerHandler customer) {
-		print("Getting check for " + customer.choice + " from the cashier.");
+		print("Getting check for " + customer.customer.getName() + " from the cashier.");
 		customer.state = CustomerStateEnum.WaitingForCashier;
 		m_cashier.sendMessage("computeCheck", new Message(this, customer.customer, customer.choice));
 	}
@@ -62,11 +62,6 @@ public class Waiter extends Agent {
 	private void bringCheckToCustomer(CustomerHandler customer) {
 		print("Bringing " + customer.customer.getName() + " his or her check.");
 		customer.state = CustomerStateEnum.Paid;
-		
-		synchronized(m_customers) {
-			m_customers.remove(customer);
-		}
-		
 		customer.customer.sendMessage("receiveCheck");
 	}
 
@@ -78,33 +73,61 @@ public class Waiter extends Agent {
 					takeCustomerToTable(c);
 					return true;
 				}
-				
+			}
+		}
+		
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
 				if (c.state == CustomerStateEnum.ReadyToOrder) {
 					takeCustomerOrder(c);
 					return true;
 				}
+			}
+		}
 				
-				if (c.state == CustomerStateEnum.Ordered) {
-					sendOrderToCook(c);
-					return true;
-				}
-				
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
 				if (c.state == CustomerStateEnum.WaitingForFood) {
 					bringFoodToCustomer(c);
 					return true;
 				}
+			}
+		}
 				
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
+				if (c.state == CustomerStateEnum.Ordered) {
+					sendOrderToCook(c);
+					return true;
+				}
+			}
+		}
+				
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
 				if (c.state == CustomerStateEnum.ReadyToReceiveCheck) {
 					getCheckFromCashier(c);
 					return true;
 				}
+			}
+		}
 				
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
 				if (c.state == CustomerStateEnum.ReadyToPay) {
 					bringCheckToCustomer(c);
 					return true;
 				}
 			}
 		}
+				
+				/*
+				if (c.state == CustomerStateEnum.Paid) {
+					m_customers.remove(c);
+					return true;
+				}
+				*/
+		
 		return false;
 	}
 	

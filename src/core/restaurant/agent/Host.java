@@ -31,7 +31,7 @@ public class Host extends Agent {
 	}
 	
 	/* PRIVATE MEMBER METHODS */
-	private boolean assignCustomerToTable(CustomerHandler customer) {
+	private void assignCustomerToTable(CustomerHandler customer) {
 		Table unassignedTable = null;
 		synchronized (m_tables) {
 			for (Table table : m_tables) {
@@ -56,11 +56,11 @@ public class Host extends Agent {
 				print("Assigning " + customer.customer.getName() + " to waiter " + waiter.waiter.getName() + " at " + unassignedTable.toString());
 				
 				customer.state = CustomerStateEnum.Eating;
+				unassignedTable.setOccupant(customer.customer);
 				waiter.state = WaiterStateEnum.Working;
 				waiter.table = unassignedTable;
 				waiter.numCustomers++;
 				waiter.waiter.sendMessage("seatCustomer", new Message(customer.customer, unassignedTable));
-				return true;
 			}
 		}
 		
@@ -69,24 +69,19 @@ public class Host extends Agent {
 			customer.state = CustomerStateEnum.Idle;
 			customer.customer.sendMessage("restaurantIsFull");
 		}
-		
-		return false;
 	}
 	
 	@Override
 	public boolean update() {
-		boolean repeat = false;
 		synchronized (m_customers) {
 			for (CustomerHandler c : m_customers) {
 				if (c.state == CustomerStateEnum.Idle) {
-					repeat = assignCustomerToTable(c);
-					if (!repeat) {
-						break;
-					}
+					assignCustomerToTable(c);
+					return true;
 				}
 			}
 		}
-		return repeat;
+		return false;
 	}
 	
 	// Messages -- Customer
@@ -120,6 +115,14 @@ public class Host extends Agent {
 				if (cust.customer == customer) {
 					m_customers.remove(cust);
 					break;
+				}
+			}
+		}
+		
+		synchronized (m_tables) {
+			for (Table table : m_tables) {
+				if (table.getOccupant() == customer) {
+					table.removeOccupant();
 				}
 			}
 		}

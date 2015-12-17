@@ -46,18 +46,28 @@ public class Cashier extends Agent {
 					computeCustomerCheck(c);
 					return true;
 				}
-				
+			}
+		}
+		
+		synchronized (m_checks) {
+			for (Check c : m_checks) {
 				if (c.getStatus() == CheckStatusEnum.Received) {
 					calculateChange(c);
 					return true;
 				}
-				
+			}
+		}
+		
+		/*
+		synchronized (m_checks) {
+			for (Check c : m_checks) {
 				if (c.getStatus() == CheckStatusEnum.Paid) {
 					m_checks.remove(c);
 					return true;
 				}
 			}
 		}
+		*/
 		
 		return false;
 	}
