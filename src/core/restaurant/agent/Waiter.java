@@ -7,6 +7,7 @@ package core.restaurant.agent;
 
 import core.agent.Agent;
 import core.agent.Message;
+import core.restaurant.Order;
 import core.restaurant.Table;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,8 +36,14 @@ public class Waiter extends Agent {
 	}
 	
 	private void takeCustomerOrder(CustomerHandler customer) {
-		customer.state = CustomerStateEnum.Ordered;
+		customer.state = CustomerStateEnum.Ordering;
 		customer.customer.sendMessage("takeOrder");
+	}
+	
+	private void sendOrderToCook(CustomerHandler customer) {
+		print("Taking this order of " + customer.choice + " to the cook.");
+		customer.state = CustomerStateEnum.WaitingForFood;
+		m_cook.sendMessage("takeOrder", new Message(new Order(this, customer.customer, customer.choice)));
 	}
 
 	@Override
@@ -50,6 +57,11 @@ public class Waiter extends Agent {
 				
 				if (c.state == CustomerStateEnum.ReadyToOrder) {
 					takeCustomerOrder(c);
+					return true;
+				}
+				
+				if (c.state == CustomerStateEnum.Ordered) {
+					sendOrderToCook(c);
 					return true;
 				}
 			}
@@ -84,7 +96,6 @@ public class Waiter extends Agent {
 	// Messages -- Customer
 	public void madeChoice(Message message) {
 		Customer customer = message.get(0);
-		
 		synchronized (m_customers) {
 			for (CustomerHandler c : m_customers) {
 				if (c.customer == customer) {
@@ -99,11 +110,25 @@ public class Waiter extends Agent {
 	public void placeOrder(Message message) {
 		Customer customer = message.get(0);
 		String choice = message.get(1);
+		synchronized (m_customers) {
+			for (CustomerHandler c : m_customers) {
+				if (c.customer == customer) {
+					c.state = CustomerStateEnum.Ordered;
+					c.choice = choice;
+				}
+			}
+		}
 		
 		print(customer.getName() + " chose to order " + choice);
 		stateChanged();
 	}
 	
+	public void pickupOrder(Message message) {
+		Order order = message.get(0);
+		
+		print("Picked up order of " + order.getChoice() + " from the cook.");
+		stateChanged();
+	}
 	/* ACCESSORS AND MUTATORS */
 	public Host getHost() { return m_host; }
 	public void setHost(Host host) { m_host = host; }
@@ -118,6 +143,7 @@ public class Waiter extends Agent {
 		public Customer customer;
 		public Table table;
 		public CustomerStateEnum state;
+		public String choice;
 		
 		public CustomerHandler(Customer customer, Table table) {
 			this.customer = customer;
@@ -130,7 +156,7 @@ public class Waiter extends Agent {
 		Waiting,
 		Seated,
 		ReadyToOrder,
-		Asked,
+		Ordering,
 		Ordered,
 		WaitingForFood,
 		HasFood,
