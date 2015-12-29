@@ -10,10 +10,12 @@ import core.agent.Message;
 import core.restaurant.Check;
 import core.restaurant.Order;
 import core.restaurant.Table;
+import gui.agents.WaiterGUI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 /**
  *
@@ -24,46 +26,165 @@ public class Waiter extends Agent {
 	private Host m_host;
 	private Cashier m_cashier;
 	private Cook m_cook;
-	private final List<CustomerHandler> m_customers;
 	private HashMap<String, Float> m_menu;
+	private final List<CustomerHandler> m_customers;
+	
+	// Animation
+	private WaiterGUI m_gui;
+	private final Semaphore m_atDestination;
 	
 	public Waiter(String name) {
 		super(name);
 		m_customers = Collections.synchronizedList(new ArrayList<CustomerHandler>());
+		
+		m_atDestination = new Semaphore(0, true);
 	}
 	
 	private void takeCustomerToTable(CustomerHandler customer) {
 		customer.state = CustomerStateEnum.Seated;
+		
+		doGoToCustomer();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
 		customer.customer.sendMessage("sitAtTable", new Message(this, customer.table, m_menu));
+		
+		doTakeCustomerToTable(customer);
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
+		doGoToWaitingArea();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
 	}
 	
 	private void takeCustomerOrder(CustomerHandler customer) {
 		customer.state = CustomerStateEnum.Ordering;
+		
+		doTakeCustomerOrder(customer);
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
 		customer.customer.sendMessage("takeOrder");
 	}
 	
 	private void sendOrderToCook(CustomerHandler customer) {
 		print("Taking " + customer.customer.getName() + "'s order of " + customer.choice + " to the cook.");
 		customer.state = CustomerStateEnum.WaitingForOrder;
+		
+		doSendOrderToCook();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
 		m_cook.sendMessage("takeOrder", new Message(new Order(this, customer.customer, customer.choice)));
 	}
 	
 	private void bringFoodToCustomer(CustomerHandler customer) {
 		print("Bringing " + customer.choice + " to " + customer.customer.getName() + ".");
 		customer.state = CustomerStateEnum.Eating;
+		
+		doBringFoodToCustomer(customer);
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
 		customer.customer.sendMessage("receiveFood");
+		
+		doGoToWaitingArea();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
 	}
 	
 	private void getCheckFromCashier(CustomerHandler customer) {
 		print("Getting check for " + customer.customer.getName() + " from the cashier.");
 		customer.state = CustomerStateEnum.WaitingForCashier;
+		
+		doGetCheckFromCashier();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
 		m_cashier.sendMessage("computeCheck", new Message(this, customer.customer, customer.choice));
 	}
 	
 	private void bringCheckToCustomer(CustomerHandler customer) {
 		print("Bringing " + customer.customer.getName() + " his or her check.");
 		customer.state = CustomerStateEnum.Paid;
+		
+		doBringCheckToCustomer(customer);
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
 		customer.customer.sendMessage("receiveCheck");
+		
+		doGoToWaitingArea();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+	}
+	
+	// Animation
+	private void doGoToCustomer() {
+		m_gui.doGoToWaitingArea();
+	}
+	
+	private void doTakeCustomerToTable(CustomerHandler customer) {
+		m_gui.doTakeCustomerToTable(customer.table);
+	}
+	
+	private void doGoToWaitingArea() {
+		m_gui.doGoToWaitingArea();
+	}
+	
+	private void doTakeCustomerOrder(CustomerHandler customer) {
+		m_gui.doTakeCustomerOrder(customer.table);
+	}
+	
+	private void doSendOrderToCook() {
+		m_gui.doSendOrderToCook();
+	}
+	
+	private void doBringFoodToCustomer(CustomerHandler customer) {
+		m_gui.doBringFoodToCustomer(customer.choice, customer.table);
+	}
+	
+	private void doGetCheckFromCashier() {
+		m_gui.doGetCheckFromCashier();
+	}
+	
+	private void doBringCheckToCustomer(CustomerHandler customer) {
+		m_gui.doBringCheckToCustomer(customer.table);
+	}
+	
+	public void atDestination() {
+		m_atDestination.release();
 	}
 
 	@Override
@@ -226,6 +347,9 @@ public class Waiter extends Agent {
 	}
 	
 	/* ACCESSORS AND MUTATORS */
+	public WaiterGUI getGUI() { return m_gui; }
+	public void setGUI(WaiterGUI gui) { m_gui = gui; }
+	
 	public Host getHost() { return m_host; }
 	public void setHost(Host host) { m_host = host; }
 	
