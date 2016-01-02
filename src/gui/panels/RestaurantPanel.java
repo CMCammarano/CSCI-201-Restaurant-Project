@@ -132,24 +132,33 @@ public class RestaurantPanel extends JPanel {
 
 		if (type.equals("Customers")) {
 			Customer c = new Customer(name);	
-			CustomerGUI g = new CustomerGUI(c, m_gui);
-
-			m_gui.getAnimationPanel().addGui(g);// dw
+			
 			c.setHost(m_restaurant.getHost());
 			c.setCashier(m_restaurant.getCashier());
+			
+			CustomerGUI g = new CustomerGUI(c, m_gui);
+			m_gui.getAnimationPanel().addGui(g);
 			c.setCustomerGUI(g);
+			
 			m_customers.add(c);
+			m_restaurant.addCustomer(c);
 			c.startThread();
 		}
 		
 		if (type.equals("Waiters")) {
 			System.out.println("Adding new waiter: " + name);
-			Waiter waiter = m_restaurant.addWaiter(name);	
-			m_waiters.add(waiter);
+			Waiter waiter = new Waiter(name);
+			waiter.setHost(m_restaurant.getHost());
+			waiter.setCashier(m_restaurant.getCashier());
+			waiter.setCook(m_restaurant.getCook());
 			
 			WaiterGUI gui = new WaiterGUI(waiter, WAITER_X_POS + ((m_waiters.size() - 1) * 25), WAITER_Y_POS);
 			m_gui.getAnimationPanel().addGui(gui);
 			waiter.setWaiterGUI(gui);
+			
+			m_waiters.add(waiter);
+			m_restaurant.addWaiter(waiter);
+			waiter.startThread();
 		}
 	}
 

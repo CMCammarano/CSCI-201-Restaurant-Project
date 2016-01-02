@@ -361,6 +361,8 @@ public class Waiter extends Agent {
 	
 	public void setMenu(HashMap<String, Float> menu) { m_menu = menu; }
 	
+	public int getNumberOfCustomers() { return m_customers.size(); }
+	
 	private class CustomerHandler {
 		public Customer customer;
 		public Table table;

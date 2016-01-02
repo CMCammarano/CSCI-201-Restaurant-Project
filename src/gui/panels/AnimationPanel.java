@@ -29,7 +29,7 @@ public class AnimationPanel extends JPanel implements ActionListener {
 	private final int WINDOWY = 350;
 	private final Dimension m_bufferSize;
 
-	private List<AgentGUI> m_actors = new ArrayList<AgentGUI>();
+	private final List<AgentGUI> m_agents;
 	
 	private static final int ZERO = 0;
 	private static final int START_TIME = 20;
@@ -43,6 +43,7 @@ public class AnimationPanel extends JPanel implements ActionListener {
 		this.setVisible(true);
 		
 		m_bufferSize = this.getSize();
+		m_agents = new ArrayList<AgentGUI>();
  
 		Timer timer = new Timer(START_TIME, this);
 		timer.start();
@@ -91,13 +92,13 @@ public class AnimationPanel extends JPanel implements ActionListener {
 		g2.setColor(Color.GRAY);
 		g2.fillRect(500, 580, 200, 20);
 		
-		for(AgentGUI gui : m_actors) {
+		for(AgentGUI gui : m_agents) {
 			if (gui.isPresent()) {
 				gui.updatePosition();
 			}
 		}
 
-		for(AgentGUI gui : m_actors) {
+		for(AgentGUI gui : m_agents) {
 			if (gui.isPresent()) {
 				gui.draw(g2);
 			}
@@ -105,7 +106,7 @@ public class AnimationPanel extends JPanel implements ActionListener {
 	}
 
 	public int getTableCount() { return m_tableCount; }
-	public void addGui(AgentGUI gui) { m_actors.add(gui); }
+	public void addGui(AgentGUI gui) { m_agents.add(gui); }
 	
 	public void addTable() {
 		m_tableCount++;

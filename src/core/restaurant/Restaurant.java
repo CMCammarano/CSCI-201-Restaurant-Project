@@ -54,28 +54,13 @@ public class Restaurant {
 		m_cashier.startThread();
 	}
 	
-	public Waiter addWaiter(String name) {
-		Waiter waiter = new Waiter(name);
-		waiter.setHost(m_host);
-		waiter.setCashier(m_cashier);
-		waiter.setCook(m_cook);
-		waiter.startThread();
-		
+	public void addWaiter(Waiter waiter) {
 		m_waiters.add(waiter);
 		m_host.addWaiter(waiter);
-		return waiter;
 	}
 	
-	public void addCustomer(String name) {
-		Customer customer = new Customer(name);
-		customer.setHost(m_host);
-		customer.setCashier(m_cashier);
-		customer.startThread();
-		
+	public void addCustomer(Customer customer) {
 		m_customers.add(customer);
-		
-		// Simulate interactions until GUI is added
-		customer.sendMessage("becomeHungry");
 	}
 	
 	public void addTable(int x, int y) {

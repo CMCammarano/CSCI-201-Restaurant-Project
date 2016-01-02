@@ -53,7 +53,7 @@ public class Host extends Agent {
 				WaiterHandler waiter = m_waiters.get(0);
 				synchronized (m_waiters) {
 					for (WaiterHandler w : m_waiters) {
-						if (waiter.numCustomers > w.numCustomers) {
+						if (waiter.waiter.getNumberOfCustomers() > w.waiter.getNumberOfCustomers()) {
 							waiter = w;
 						}
 					}
@@ -65,7 +65,6 @@ public class Host extends Agent {
 				unassignedTable.setOccupant(customer.customer);
 				waiter.state = WaiterStateEnum.Working;
 				waiter.table = unassignedTable;
-				waiter.numCustomers++;
 				waiter.waiter.sendMessage("seatCustomer", new Message(customer.customer, unassignedTable));
 			}
 		}
@@ -137,6 +136,7 @@ public class Host extends Agent {
 		waiter.setMenu(m_menu);
 		WaiterHandler w = new WaiterHandler(waiter);
 		m_waiters.add(w);
+		stateChanged();
 	}
 
 	public HostGUI getHostGUI() { return m_gui; }
@@ -163,7 +163,6 @@ public class Host extends Agent {
 		public Waiter waiter;
 		public Table table;
 		public WaiterStateEnum state;
-		public int numCustomers;
 		
 		public WaiterHandler(Waiter waiter) {
 			this.waiter = waiter;
