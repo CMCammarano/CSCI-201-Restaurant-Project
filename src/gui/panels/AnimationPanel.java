@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package gui.panels;
 
 import gui.agents.AgentGUI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import javax.swing.Timer;
  */
 public class AnimationPanel extends JPanel implements ActionListener {
 
-	private int m_tableCount = 0;
+	private int m_tableCount = 3;
 	
 	private final int WINDOWX = 450;
 	private final int WINDOWY = 350;
@@ -40,8 +39,8 @@ public class AnimationPanel extends JPanel implements ActionListener {
 	private static final int G2_SCALE_Y = 50;
 	
 	public AnimationPanel() {
-		setSize(WINDOWX, WINDOWY);
-		setVisible(true);
+		this.setSize(WINDOWX, WINDOWY);
+		this.setVisible(true);
 		
 		m_bufferSize = this.getSize();
  
@@ -67,18 +66,11 @@ public class AnimationPanel extends JPanel implements ActionListener {
 		}
 		
 		// Base code for filling in tables. I can make a list of them here, then set their coordinates for the agents when they're drawn.
-	 	for(int cnt = 0; cnt < 6; cnt++) {
-	 		//Here is the table
-	 		g2.setColor(Color.ORANGE);
-	 		g2.fillRect(G2_POS_X + (100 * cnt), G2_POS_Y + 100, G2_SCALE_X, G2_SCALE_Y);//200 and 250 need to be table params
-	 	}
-	 		
-		// Base code for filling in tables. I can make a list of them here, then set their coordinates for the agents when they're drawn.
 		for(int cnt = 0; cnt < m_tableCount; cnt++) {
 			//Here is the table
 			g2.setColor(Color.ORANGE);
 			g2.fillRect(G2_POS_X + (100 * cnt), G2_POS_Y, G2_SCALE_X, G2_SCALE_Y);//200 and 250 need to be table params
-		}
+		}	
 
 		// Grill
 		g2.setColor(Color.DARK_GRAY);
@@ -113,7 +105,6 @@ public class AnimationPanel extends JPanel implements ActionListener {
 	}
 
 	public int getTableCount() { return m_tableCount; }
-	
 	public void addGui(AgentGUI gui) { m_actors.add(gui); }
 	
 	public void addTable() {

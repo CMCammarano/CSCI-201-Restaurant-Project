@@ -347,8 +347,8 @@ public class Waiter extends Agent {
 	}
 	
 	/* ACCESSORS AND MUTATORS */
-	public WaiterGUI getGUI() { return m_gui; }
-	public void setGUI(WaiterGUI gui) { m_gui = gui; }
+	public WaiterGUI getWaiterGUI() { return m_gui; }
+	public void setWaiterGUI(WaiterGUI gui) { m_gui = gui; }
 	
 	public Host getHost() { return m_host; }
 	public void setHost(Host host) { m_host = host; }

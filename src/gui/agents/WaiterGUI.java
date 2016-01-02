@@ -16,12 +16,13 @@ import java.awt.Graphics2D;
  */
 public class WaiterGUI extends AgentGUI {
 
+	private final Waiter m_waiter;
+	
 	private boolean m_acting;
 	private boolean m_paused;
 	private boolean m_hasFood;
 	
 	private String m_choice;
-	private Waiter m_waiter;
 	
 	// Coordinates
 	private int m_xPos;
@@ -30,11 +31,11 @@ public class WaiterGUI extends AgentGUI {
 	private int m_xDestination;
 	private int m_yDestination;
 	
-	private int m_xWaitPos;
-	private int m_yWaitPos;
-
 	public int m_xTable;
 	public int m_yTable;
+	
+	private final int m_xWaitPos;
+	private final int m_yWaitPos;
 	
 	private static final int X_COOK_POS = 600;
 	private static final int Y_COOK_POS = 600;
@@ -49,6 +50,8 @@ public class WaiterGUI extends AgentGUI {
 	private static final int Y_SCALE = 20;
 	
 	public WaiterGUI(Waiter waiter, int x, int y) {
+		m_waiter = waiter;
+		
 		m_acting = false;
 		m_paused = false;
 		m_hasFood = false;

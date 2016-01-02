@@ -8,6 +8,7 @@ package core.restaurant.agent;
 import core.agent.Agent;
 import core.agent.Message;
 import core.restaurant.Table;
+import gui.agents.HostGUI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ import java.util.List;
  */
 public class Host extends Agent {
 
+	private HostGUI m_gui;
+	
 	private final List<WaiterHandler> m_waiters;
 	private final List<CustomerHandler> m_customers;
 	private final List<Table> m_tables;
@@ -135,6 +138,9 @@ public class Host extends Agent {
 		WaiterHandler w = new WaiterHandler(waiter);
 		m_waiters.add(w);
 	}
+
+	public HostGUI getHostGUI() { return m_gui; }
+	public void setHostGUI(HostGUI gui) { m_gui = gui; }
 	
 	private class CustomerHandler {
 		public Customer customer;

@@ -9,6 +9,7 @@ import core.agent.Agent;
 import core.agent.Message;
 import core.restaurant.Order;
 import core.restaurant.Order.OrderStatusEnum;
+import gui.agents.CookGUI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
  */
 public class Cook extends Agent {
 
+	private CookGUI m_gui;
 	private final List<Order> m_orders;
 	
 	public Cook(String name) {
@@ -66,4 +68,7 @@ public class Cook extends Agent {
 		
 		stateChanged();
 	}
+	
+	public CookGUI getCookGUI() { return m_gui; }
+	public void setCookGUI(CookGUI gui) { m_gui = gui; }
 }

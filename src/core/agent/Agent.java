@@ -53,6 +53,7 @@ public abstract class Agent {
 			//Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
+	
 	public void sendMessage(String message, Message data) {
 		try {
 			Method method = getClass().getDeclaredMethod(message, Message.class);
@@ -81,7 +82,10 @@ public abstract class Agent {
 		}
 	}
 	
-	/* PUBLIC MEMBER FUNCTIONS */
+	public void pause() {}
+	public void resume() {}
+	
+	/* ACCESSORS AND MUTATORS */
 	public String getName() { return m_name; }
 	public void setName(String name) { m_name = name; }
 	

@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class Restaurant {
 	
-	private static final int NUMBER_OF_TABLES = 5;
+	private static final int NUMBER_OF_TABLES = 3;
 	private final Host m_host;
 	private final Cook m_cook;
 	private final Cashier m_cashier;
@@ -34,7 +34,7 @@ public class Restaurant {
 		m_customers = new ArrayList<Customer>();
 		m_tables = new ArrayList<Table>();
 		for (int i = 0; i < NUMBER_OF_TABLES; i++) {
-			m_tables.add(new Table(i + 1, i, i));
+			m_tables.add(new Table(i + 1, (150 + (100 * i)), 350));
 		}
 		
 		m_menu = new HashMap<String, Float>();
@@ -52,32 +52,21 @@ public class Restaurant {
 		
 		m_cashier = new Cashier("Cashier", m_menu);
 		m_cashier.startThread();
-	
-		// FOR INITIAL TESTING
-		AddWaiter("Waiter1");
-		AddWaiter("Waiter2");
-		AddCustomer("Customer1");
-		AddCustomer("Customer2");
-		AddCustomer("Customer3");
-		AddCustomer("Customer4");
-		AddCustomer("Customer5");
 	}
 	
-	public void AddWaiter(String name) {
+	public Waiter addWaiter(String name) {
 		Waiter waiter = new Waiter(name);
 		waiter.setHost(m_host);
 		waiter.setCashier(m_cashier);
 		waiter.setCook(m_cook);
 		waiter.startThread();
 		
-		m_host.addWaiter(waiter);
 		m_waiters.add(waiter);
+		m_host.addWaiter(waiter);
+		return waiter;
 	}
 	
-	public List<Customer> getCustomers() { return m_customers; }
-	public List<Waiter> getWaiters() { return m_waiters; }
-	
-	public void AddCustomer(String name) {
+	public void addCustomer(String name) {
 		Customer customer = new Customer(name);
 		customer.setHost(m_host);
 		customer.setCashier(m_cashier);
@@ -88,4 +77,17 @@ public class Restaurant {
 		// Simulate interactions until GUI is added
 		customer.sendMessage("becomeHungry");
 	}
+	
+	public void addTable(int x, int y) {
+		if (m_tables.size() < 6) {
+			m_tables.add(new Table(m_tables.size(), (150 + (100 * m_tables.size())), 350));
+		}
+	}
+	
+	public List<Customer> getCustomers() { return m_customers; }
+	public List<Waiter> getWaiters() { return m_waiters; }
+
+	public Host getHost() { return m_host; }
+	public Cook getCook() { return m_cook; }
+	public Cashier getCashier() { return m_cashier; }
 }

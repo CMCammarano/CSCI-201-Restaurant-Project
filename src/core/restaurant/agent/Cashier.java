@@ -9,6 +9,7 @@ import core.agent.Agent;
 import core.agent.Message;
 import core.restaurant.Check;
 import core.restaurant.Check.CheckStatusEnum;
+import gui.agents.CashierGUI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import java.util.List;
  */
 public class Cashier extends Agent {
 
+	private CashierGUI m_gui;
+	
 	private final List<Check> m_checks;
 	private final HashMap<String, Float> m_menu;
 	
@@ -97,4 +100,7 @@ public class Cashier extends Agent {
 		print(customer.getName() + " is paying for his/her meal.");
 		stateChanged();
 	}
+
+	public CashierGUI getCashierGUI() { return m_gui; }
+	public void setCashierGUI(CashierGUI gui) { m_gui = gui; }
 }

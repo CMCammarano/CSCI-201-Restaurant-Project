@@ -269,6 +269,9 @@ public class Customer extends Agent {
 	
 	public Cashier getCashier() { return m_cashier; }
 	public void setCashier(Cashier cashier) { m_cashier = cashier; }
+
+	public CustomerGUI getCustomerGUI() { return m_gui; }
+	public void setCustomerGUI(CustomerGUI gui) { m_gui = gui; }
 	
 	/* ENUMERATIONS */
 	private enum CustomerStateEnum {
