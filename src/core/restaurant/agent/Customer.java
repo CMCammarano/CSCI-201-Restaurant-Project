@@ -11,6 +11,8 @@ import core.restaurant.Table;
 import gui.agents.CustomerGUI;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -31,6 +33,7 @@ public class Customer extends Agent {
 	private Table m_table;
 	private HashMap<String, Float> m_menu;
 	
+	private final Timer m_timer;
 	private final Semaphore m_atDestination;
 	
 	// GUI
@@ -46,6 +49,7 @@ public class Customer extends Agent {
 		m_choice = "";
 		m_state = CustomerStateEnum.Idle;
 		m_event = EventEnum.None;
+		m_timer = new Timer();
 		m_atDestination = new Semaphore(0, true);
 	}
 	
@@ -58,6 +62,7 @@ public class Customer extends Agent {
 		m_choice = "";
 		m_state = CustomerStateEnum.Idle;
 		m_event = EventEnum.None;
+		m_timer = new Timer();
 		m_atDestination = new Semaphore(0, true);
 	}
 	
@@ -156,12 +161,22 @@ public class Customer extends Agent {
 	}
 	
 	private void eatFood() {
+		print("I am eating my " + m_choice + ".");
 		m_state = CustomerStateEnum.Eating;
-		m_event = EventEnum.DoneEating;
+		
+		m_timer.schedule(new TimerTask() {
+			Object agent = 1;
+			public void run() {
+				m_event = EventEnum.DoneEating;
+				stateChanged();
+			}
+		}, m_hunger * 1000);
 	}
 	
 	private void askForCheck() {
+		print("I am ready to pay!");
 		m_state = CustomerStateEnum.AskForCheck;
+		
 		m_waiter.sendMessage("askForCheck", new Message(this));
 	}
 	
