@@ -107,7 +107,7 @@ public class RestaurantGUI extends JFrame implements ActionListener {
 		m_pauseButton.addActionListener(this);
 		
 		m_infoPanel.add(m_addTableButton);
-		m_infoPanel.add(m_pauseButton);
+		//m_infoPanel.add(m_pauseButton);
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
