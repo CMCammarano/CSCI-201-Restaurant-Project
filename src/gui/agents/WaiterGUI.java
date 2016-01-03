@@ -174,6 +174,9 @@ public class WaiterGUI extends AgentGUI {
 			case "salad":
 				m_choice = "sa";
 				break;
+			case "burger":
+				m_choice = "bu";
+				break;
 		}
 		
 		m_xDestination = X_COOK_POS;
@@ -196,6 +199,9 @@ public class WaiterGUI extends AgentGUI {
 				break;
 			case "salad":
 				m_choice = "sa";
+				break;
+			case "burger":
+				m_choice = "bu";
 				break;
 		}
 		

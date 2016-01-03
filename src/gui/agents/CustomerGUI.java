@@ -162,6 +162,9 @@ public class CustomerGUI extends AgentGUI {
 			case "salad":
 				m_choice = "sa";
 				break;
+			case "burger":
+				m_choice = "bu";
+				break;
 		}
 		
 		m_iconState = IconState.OrderPending;
