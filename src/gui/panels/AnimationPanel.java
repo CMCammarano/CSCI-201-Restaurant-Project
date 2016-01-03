@@ -67,10 +67,10 @@ public class AnimationPanel extends JPanel implements ActionListener {
 		}
 		
 		// Base code for filling in tables. I can make a list of them here, then set their coordinates for the agents when they're drawn.
-		for(int cnt = 0; cnt < m_tableCount; cnt++) {
+		for(int i = 0; i < m_tableCount; i++) {
 			//Here is the table
 			g2.setColor(Color.ORANGE);
-			g2.fillRect(G2_POS_X + (100 * cnt), G2_POS_Y, G2_SCALE_X, G2_SCALE_Y);//200 and 250 need to be table params
+			g2.fillRect(G2_POS_X + (100 * i), G2_POS_Y, G2_SCALE_X, G2_SCALE_Y);//200 and 250 need to be table params
 		}	
 
 		// Grill

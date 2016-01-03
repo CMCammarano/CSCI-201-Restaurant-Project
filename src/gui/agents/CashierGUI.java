@@ -25,8 +25,8 @@ public class CashierGUI extends AgentGUI {
 	
 	public CashierGUI(Cashier cashier) {
 		m_cashier = cashier;
-		m_xPos = 300;
-		m_yPos = 10;
+		m_xPos = 600;
+		m_yPos = 50;
 	}
 	
 	@Override

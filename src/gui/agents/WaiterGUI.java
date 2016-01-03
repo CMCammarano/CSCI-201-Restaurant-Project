@@ -84,7 +84,7 @@ public class WaiterGUI extends AgentGUI {
 			m_xPos--;
 		}
 		
-		if (m_yPos < m_yDestination) {
+		else if (m_yPos < m_yDestination) {
 			m_yPos++;
 		}
 		
@@ -104,7 +104,7 @@ public class WaiterGUI extends AgentGUI {
 		graphics.setColor(Color.MAGENTA);
 		graphics.fillRect(m_xPos, m_yPos, X_SCALE, Y_SCALE);
 		
-		if(m_hasFood) {
+		if(m_hasFood && m_choice != null) {
 			graphics.setColor(Color.BLACK);
 			graphics.drawString(m_choice, m_xPos + X_SCALE, m_yPos + Y_SCALE);
 		}
@@ -137,7 +137,7 @@ public class WaiterGUI extends AgentGUI {
 		m_yTable = table.getPosY();
 		
 		m_xDestination = m_xTable + X_SCALE;
-		m_yDestination = m_yTable + Y_SCALE;
+		m_yDestination = m_yTable - 50;
 		
 		m_acting = true;
 	}
@@ -147,6 +147,7 @@ public class WaiterGUI extends AgentGUI {
 		m_yDestination = m_yWaitPos;
 		
 		m_acting = true;
+		m_hasFood = false;
 	}
 	
 	public void doTakeCustomerOrder(Table table) {
@@ -154,15 +155,31 @@ public class WaiterGUI extends AgentGUI {
 		m_yTable = table.getPosY();
 		
 		m_xDestination = m_xTable + X_SCALE;
-		m_yDestination = m_yTable - Y_SCALE;
+		m_yDestination = m_yTable - 50;
 		
 		m_acting = true;
 	}
 	
-	public void doSendOrderToCook() {
+	public void doSendOrderToCook(String choice) {
+		switch(choice) {
+			case "steak":
+				m_choice = "st";
+				break;
+			case "chicken":
+				m_choice = "ch";
+				break;
+			case "pizza":
+				m_choice = "pi";
+				break;
+			case "salad":
+				m_choice = "sa";
+				break;
+		}
+		
 		m_xDestination = X_COOK_POS;
 		m_yDestination = Y_COOK_POS - 2 * Y_SCALE;
 		
+		m_hasFood = true;
 		m_acting = true;
 	}
 	
@@ -186,9 +203,19 @@ public class WaiterGUI extends AgentGUI {
 		m_yTable = table.getPosY();
 		
 		m_xDestination = m_xTable + X_SCALE;
-		m_yDestination = m_yTable - Y_SCALE;
+		m_yDestination = m_yTable - 50;
 		
 		m_hasFood = true;
+		m_acting = true;
+	}
+	
+	public void doPromptCheck(Table table) {
+		m_xTable = table.getPosX();
+		m_yTable = table.getPosY();
+		
+		m_xDestination = m_xTable + X_SCALE;
+		m_yDestination = m_yTable - 50;
+		
 		m_acting = true;
 	}
 	
@@ -204,7 +231,7 @@ public class WaiterGUI extends AgentGUI {
 		m_yTable = table.getPosY();
 		
 		m_xDestination = m_xTable + X_SCALE;
-		m_yDestination = m_yTable - Y_SCALE;
+		m_yDestination = m_yTable - 50;
 		
 		m_acting = true;
 	}

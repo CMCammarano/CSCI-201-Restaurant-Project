@@ -11,6 +11,7 @@ import core.restaurant.Table;
 import gui.agents.CustomerGUI;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 /**
  *
@@ -30,6 +31,8 @@ public class Customer extends Agent {
 	private Table m_table;
 	private HashMap<String, Float> m_menu;
 	
+	private final Semaphore m_atDestination;
+	
 	// GUI
 	private CustomerGUI m_gui;
 	
@@ -43,6 +46,7 @@ public class Customer extends Agent {
 		m_choice = "";
 		m_state = CustomerStateEnum.Idle;
 		m_event = EventEnum.None;
+		m_atDestination = new Semaphore(0, true);
 	}
 	
 	public Customer(String name, int hunger, float money) {
@@ -54,12 +58,21 @@ public class Customer extends Agent {
 		m_choice = "";
 		m_state = CustomerStateEnum.Idle;
 		m_event = EventEnum.None;
+		m_atDestination = new Semaphore(0, true);
 	}
 	
 	/* PRIVATE MEMBER METHODS */
 	private void goToRestaurant() {
 		print("Going to the restaurant.");
 		print("I have: $" + getMoney());
+		
+		doGoToHost();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
 		if (m_money < 5.99f) {
 			print("I can't afford anything here.");
 			m_state = CustomerStateEnum.Leaving;
@@ -67,7 +80,6 @@ public class Customer extends Agent {
 		}
 		
 		else {
-			//m_gui.doGoToHost();
 			m_state = CustomerStateEnum.WaitingInRestaurant;
 			m_host.sendMessage("customerEnteredRestaurant", new Message(this));
 		}
@@ -77,11 +89,26 @@ public class Customer extends Agent {
 		print("Leaving the restaurant.");
 		m_state = CustomerStateEnum.Idle;
 		m_choice = "";
+		
+		doExitRestaurant();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+			
 		m_host.sendMessage("customerLeftRestaurant", new Message(this));
 	}
 	
 	private void followWaiter() {
 		m_state = CustomerStateEnum.Seated;
+		
+		doFollowWaiter();
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
 	}
 	
 	private void chooseFood() {
@@ -153,6 +180,19 @@ public class Customer extends Agent {
 		}
 		m_money -= amountToPay;
 		m_cashier.sendMessage("payForMeal", new Message(this, amountToPay));
+	}
+	
+	// Animations
+	private void doGoToHost() {
+		m_gui.doGoToHost();
+	}
+	
+	private void doExitRestaurant() {
+		m_gui.doExitRestaurant();
+	}
+	
+	private void doFollowWaiter() {
+		m_gui.doGoToSeat(m_table);
 	}
 	
 	/* PUBLIC MEMBER METHODS */
@@ -252,6 +292,11 @@ public class Customer extends Agent {
 		
 		print("Received $" + change + " from the cashier.");
 		stateChanged();
+	}
+	
+	// Messages -- Animation
+	public void atDestination() {
+		m_atDestination.release();
 	}
 	
 	/* ACCESSORS AND MUTATORS */

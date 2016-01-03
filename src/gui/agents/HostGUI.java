@@ -25,8 +25,8 @@ public class HostGUI extends AgentGUI {
 	
 	public HostGUI(Host host) {
 		m_host = host;
-		m_xPos = 50;
-		m_yPos = 50;
+		m_xPos = 100;
+		m_yPos = 100;
 	}	
 
 	@Override

@@ -84,7 +84,7 @@ public class Waiter extends Agent {
 		print("Taking " + customer.customer.getName() + "'s order of " + customer.choice + " to the cook.");
 		customer.state = CustomerStateEnum.WaitingForOrder;
 		
-		doSendOrderToCook();
+		doSendOrderToCook(customer);
 		try {
 			m_atDestination.acquire();
 		} catch (InterruptedException e) {
@@ -119,6 +119,13 @@ public class Waiter extends Agent {
 		print("Getting check for " + customer.customer.getName() + " from the cashier.");
 		customer.state = CustomerStateEnum.WaitingForCashier;
 		
+		doPromptCheck(customer);
+		try {
+			m_atDestination.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace(System.err);
+		}
+		
 		doGetCheckFromCashier();
 		try {
 			m_atDestination.acquire();
@@ -152,7 +159,7 @@ public class Waiter extends Agent {
 	
 	// Animation
 	private void doGoToCustomer() {
-		m_gui.doGoToWaitingArea();
+		m_gui.doGoToCustomer();
 	}
 	
 	private void doTakeCustomerToTable(CustomerHandler customer) {
@@ -167,12 +174,16 @@ public class Waiter extends Agent {
 		m_gui.doTakeCustomerOrder(customer.table);
 	}
 	
-	private void doSendOrderToCook() {
-		m_gui.doSendOrderToCook();
+	private void doSendOrderToCook(CustomerHandler customer) {
+		m_gui.doSendOrderToCook(customer.choice);
 	}
 	
 	private void doBringFoodToCustomer(CustomerHandler customer) {
 		m_gui.doBringFoodToCustomer(customer.choice, customer.table);
+	}
+	
+	private void doPromptCheck(CustomerHandler customer) {
+		m_gui.doPromptCheck(customer.table);
 	}
 	
 	private void doGetCheckFromCashier() {

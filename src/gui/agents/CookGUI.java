@@ -25,8 +25,8 @@ public class CookGUI extends AgentGUI {
 	
 	public CookGUI(Cook cook) {
 		m_cook = cook;
-		m_xPos = 500;
-		m_yPos = 500;
+		m_xPos = 600;
+		m_yPos = 600;
 	}
 
 	@Override

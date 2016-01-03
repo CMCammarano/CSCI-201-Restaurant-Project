@@ -85,7 +85,7 @@ public class RestaurantPanel extends JPanel {
 		JLabel label = new JLabel();
 		//restLabel.setLayout(new BoxLayout((Container)restLabel, BoxLayout.Y_AXIS));
 		m_restaurantLabel.setLayout(new BorderLayout());
-		label.setText("<html><h3><u>Your Lovely Staff</u></h3>" + "<table><tr><td>Host:</td><td>" + m_restaurant.getHost().getName() + "<tr><td>Cook:</td><td>" + m_restaurant.getCook().getName() + "</td></tr></table><h3><u> Menu</u></h3><table><tr><td>Steak</td><td>$15.99</td></tr><tr><td>Chicken</td><td>$10.99</td></tr><tr><td>Salad</td><td>$5.99</td></tr><tr><td>Pizza</td><td>$8.99</td></tr></table><br></html>");
+		label.setText("<html><h3><u>Your Lovely Staff</u></h3>" + "<table><tr><td>Host:</td><td>" + m_restaurant.getHost().getName() + "<tr><td>Cook:</td><td>" + m_restaurant.getCook().getName() + "</td></tr></table><h3><u> Menu</u></h3><table><tr><td>Steak</td><td>$10.99</td></tr><tr><td>Chicken</td><td>$9.99</td></tr><tr><td>Burger</td><td>$8.99</td></tr><tr><td>Pizza</td><td>$7.99</td></tr><tr><td>Salad</td><td>$5.99</td></tr></table><br></html>");
 
 		m_restaurantLabel.setBorder(BorderFactory.createRaisedBevelBorder());
 		m_restaurantLabel.add(label, BorderLayout.CENTER);

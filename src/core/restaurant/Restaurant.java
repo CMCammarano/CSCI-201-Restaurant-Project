@@ -39,9 +39,9 @@ public class Restaurant {
 		
 		m_menu = new HashMap<String, Float>();
 		m_menu.put("steak", 10.99f);
-		m_menu.put("chicken", 8.99f);
+		m_menu.put("burger", 8.99f);
 		m_menu.put("salad", 5.99f);
-		m_menu.put("burger", 9.99f);
+		m_menu.put("chicken", 9.99f);
 		m_menu.put("pizza", 7.99f);
 		
 		m_host = new Host("Host", m_tables, m_menu);
